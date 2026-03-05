@@ -47,3 +47,20 @@ collision_mask = 2
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DeathZone" unique_id=1665502300]
 position = Vector2(240, 880)
 shape = SubResource("RectangleShape2D_1bvp3")
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=2049628320]
+
+[node name="TopBar" type="HBoxContainer" parent="HUD" unique_id=741500545]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 40.0
+grow_horizontal = 2
+theme_override_constants/separation = 20
+
+[node name="ScoreLabel" type="Label" parent="HUD/TopBar" unique_id=1357324826]
+layout_mode = 2
+text = "Score: 0"
+
+[node name="LevelLabel" type="Label" parent="HUD/TopBar" unique_id=502985020]
+layout_mode = 2
+text = "Level: 1"

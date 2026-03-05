@@ -19,10 +19,17 @@ var bricks_remaining = 0
 @onready var ball = $Ball
 @onready var paddle = $Paddle
 @onready var death_zone = $DeathZone
+@onready var score_label = $HUD/TopBar/ScoreLabel
+@onready var level_label = $HUD/TopBar/LevelLabel
 
 func _ready() -> void:
 	spawn_bricks()
 	death_zone.body_entered.connect(_on_death_zone_body_entered)
+	update_hud()
+
+func update_hud() -> void:
+	score_label.text = "Score: " + str(score)
+	level_label.text = "Level: " + str(level)
 
 func spawn_bricks() -> void:
 	for child in get_children():
@@ -45,13 +52,14 @@ func spawn_bricks() -> void:
 func _on_brick_destroyed() -> void:
 	score += 10
 	bricks_remaining -= 1
-	print("Score: ", score, " | Bricks left: ", bricks_remaining)
+	update_hud()
 
 	if bricks_remaining <= 0:
 		level_clear()
 
 func level_clear() -> void:
 	level += 1
+	update_hud()
 	print("LEVEL CLEAR! Starting level ", level)
 	ball.speed = BASE_SPEED + (level - 1) * SPEED_INCREMENT
 	ball.position = Vector2(240, 600)
@@ -81,4 +89,4 @@ func restart() -> void:
 	paddle.position = Vector2(240, 780)
 	ball.launch()
 	spawn_bricks()
-	print("Score: ", score)
+	update_hud()

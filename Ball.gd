@@ -6,6 +6,7 @@ var active: bool = true
 var speed: float = 500.0
 
 func _ready() -> void:
+	add_to_group("balls")
 	launch()
 
 func launch() -> void:
@@ -16,6 +17,11 @@ func launch() -> void:
 func stop() -> void:
 	active = false
 	velocity = Vector2.ZERO
+
+func set_speed(new_speed: float) -> void:
+	speed = new_speed
+	if active and velocity.length() > 0:
+		velocity = velocity.normalized() * speed
 
 func _physics_process(delta: float) -> void:
 	if not active:

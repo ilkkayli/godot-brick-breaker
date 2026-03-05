@@ -32,7 +32,6 @@ func _physics_process(delta: float) -> void:
 		powerup_timer -= delta
 		if powerup_timer <= 0:
 			deactivate_powerup()
-
 	velocity.x = (target_x - global_position.x) / delta
 	velocity.y = 0
 	move_and_slide()
@@ -44,21 +43,24 @@ func _clamped(x: float) -> float:
 func get_current_width() -> float:
 	return PADDLE_WIDTH_POWERED if powered_up else PADDLE_WIDTH
 
-func collect_powerup() -> void:
+func collect_powerup(type: int) -> void:
+	get_parent().apply_powerup(type)
+
+func activate_expand() -> void:
 	powered_up = true
 	powerup_timer = POWERUP_DURATION
-	_update_collision_shape()
-	print("Power-up! Paddle laajenee 10 sekunniksi")
+	_update_shape()
+	print("Expand Paddle!")
 
 func deactivate_powerup() -> void:
 	powered_up = false
 	powerup_timer = 0.0
-	_update_collision_shape()
-	print("Power-up loppui")
+	_update_shape()
+	print("Paddle palautui normaaliksi")
 
-func _update_collision_shape() -> void:
+func _update_shape() -> void:
 	var shape = $CollisionShape2D.shape
 	shape.size.x = get_current_width() / 2.0
-	var color_rect = $ColorRect
-	color_rect.size.x = get_current_width()
-	color_rect.position.x = -get_current_width() / 2.0
+	var cr = $ColorRect
+	cr.size.x = get_current_width()
+	cr.position.x = -get_current_width() / 2.0

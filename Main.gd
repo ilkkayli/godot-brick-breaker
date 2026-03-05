@@ -1,6 +1,7 @@
 extends Node2D
 
 const BRICK_SCENE = preload("res://Brick.tscn")
+const PowerUp = preload("res://PowerUp.gd")  # ← lisää tämä rivi
 
 const COLS = 6
 const ROWS = 5
@@ -10,17 +11,20 @@ const PADDING = 10
 const TOP_OFFSET = 80
 const BASE_SPEED = 500.0
 const SPEED_INCREMENT = 40.0
+const MAX_LIVES = 3
 
 var score = 0
 var game_over = false
 var level = 1
 var bricks_remaining = 0
+var lives = MAX_LIVES
 
 @onready var ball = $Ball
 @onready var paddle = $Paddle
 @onready var death_zone = $DeathZone
 @onready var score_label = $HUD/TopBar/ScoreLabel
 @onready var level_label = $HUD/TopBar/LevelLabel
+@onready var lives_label = $HUD/TopBar/LivesLabel
 
 func _ready() -> void:
 	spawn_bricks()
@@ -30,6 +34,7 @@ func _ready() -> void:
 func update_hud() -> void:
 	score_label.text = "Score: " + str(score)
 	level_label.text = "Level: " + str(level)
+	lives_label.text = "Lives: " + str(lives)
 
 func spawn_bricks() -> void:
 	for child in get_children():
@@ -49,11 +54,15 @@ func spawn_bricks() -> void:
 			brick.brick_destroyed.connect(_on_brick_destroyed)
 			add_child(brick)
 
+func respawn_ball() -> void:
+	ball.position = Vector2(240, 600)
+	ball.speed = BASE_SPEED + (level - 1) * SPEED_INCREMENT
+	ball.launch()
+
 func _on_brick_destroyed() -> void:
 	score += 10
 	bricks_remaining -= 1
 	update_hud()
-
 	if bricks_remaining <= 0:
 		level_clear()
 
@@ -61,16 +70,36 @@ func level_clear() -> void:
 	level += 1
 	update_hud()
 	print("LEVEL CLEAR! Starting level ", level)
-	ball.speed = BASE_SPEED + (level - 1) * SPEED_INCREMENT
-	ball.position = Vector2(240, 600)
-	ball.launch()
+	respawn_ball()
 	spawn_bricks()
 
 func _on_death_zone_body_entered(body: Node) -> void:
-	if body == ball:
-		game_over = true
-		ball.stop()
-		print("GAME OVER | Final score: ", score, " | Level: ", level)
+	if not (body is CharacterBody2D and body.has_method("set_speed")):
+		return
+
+	body.stop()
+
+	if body != ball:
+		body.queue_free()
+
+	await get_tree().process_frame
+
+	# Tarkista onko aktiivisia extrapalloja jäljellä
+	var active_balls = 0
+	for child in get_children():
+		if child is CharacterBody2D and child.has_method("set_speed") and child != ball and child.active:
+			active_balls += 1
+
+	# Jos ei extrapalloja ja alkuperäinen on pysähtynyt
+	if active_balls == 0 and not ball.active:
+		lives -= 1
+		update_hud()
+		if lives > 0:
+			print("Lives remaining: ", lives)
+			respawn_ball()
+		else:
+			game_over = true
+			print("GAME OVER | Score: ", score, " | Level: ", level)
 
 func _input(event: InputEvent) -> void:
 	if not game_over:
@@ -84,9 +113,65 @@ func restart() -> void:
 	game_over = false
 	score = 0
 	level = 1
-	ball.speed = BASE_SPEED
-	ball.position = Vector2(240, 600)
+	lives = MAX_LIVES
+	is_slowed = false
+	# Poista vain extrapallot
+	for child in get_children():
+		if child is CharacterBody2D and child.has_method("set_speed") and child != ball:
+			child.queue_free()
 	paddle.position = Vector2(240, 780)
-	ball.launch()
+	if paddle.powered_up:
+		paddle.deactivate_powerup()
+	await get_tree().process_frame
+	respawn_ball()
 	spawn_bricks()
 	update_hud()
+	
+const SLOW_DURATION: float = 8.0
+const SLOW_MULTIPLIER: float = 0.5
+
+var slow_timer: float = 0.0
+var is_slowed: bool = false
+
+func _process(delta: float) -> void:
+	if is_slowed:
+		slow_timer -= delta
+		if slow_timer <= 0:
+			deactivate_slow()
+
+func apply_powerup(type: int) -> void:
+	match type:
+		PowerUp.Type.EXPAND_PADDLE:
+			paddle.activate_expand()
+		PowerUp.Type.MULTIBALL:
+			spawn_extra_ball()
+		PowerUp.Type.SLOW_BALL:
+			activate_slow()
+		PowerUp.Type.EXTRA_LIFE:
+			lives += 1
+			update_hud()
+			print("Extra life! Lives: ", lives)
+
+func spawn_extra_ball() -> void:
+	var ball_scene = load("res://Ball.tscn")
+	var new_ball = ball_scene.instantiate()
+	new_ball.position = Vector2(240, 600)
+	new_ball.speed = BASE_SPEED + (level - 1) * SPEED_INCREMENT
+	add_child(new_ball)
+	print("Multiball!")
+
+func activate_slow() -> void:
+	is_slowed = true
+	slow_timer = SLOW_DURATION
+	_set_all_ball_speeds(BASE_SPEED * SLOW_MULTIPLIER)
+	print("Slow Ball!")
+
+func deactivate_slow() -> void:
+	is_slowed = false
+	_set_all_ball_speeds(BASE_SPEED + (level - 1) * SPEED_INCREMENT)
+	print("Slow loppui")
+
+func _set_all_ball_speeds(new_speed: float) -> void:
+	for child in get_children():
+		if child is CharacterBody2D and child.has_method("set_speed"):
+			child.set_speed(new_speed)

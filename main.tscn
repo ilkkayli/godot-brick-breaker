@@ -64,3 +64,8 @@ text = "Score: 0"
 [node name="LevelLabel" type="Label" parent="HUD/TopBar" unique_id=502985020]
 layout_mode = 2
 text = "Level: 1"
+
+[node name="LivesLabel" type="Label" parent="HUD/TopBar" unique_id=1828455096]
+layout_mode = 2
+text = "Lives: 3
+"

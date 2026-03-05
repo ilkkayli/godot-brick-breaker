@@ -1,0 +1,14 @@
+# Godot 4+ specific ignores
+.import/
+.export/
+.export.cfg
+
+# Godot cache
+.godot/
+
+# Mono (jos joskus käytät)
+.mono/
+
+# OS
+.DS_Store
+Thumbs.db

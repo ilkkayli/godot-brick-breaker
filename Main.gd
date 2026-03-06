@@ -1,14 +1,8 @@
 extends Node2D
 
 const BRICK_SCENE = preload("res://Brick.tscn")
-const PowerUp = preload("res://PowerUp.gd")  # ← lisää tämä rivi
+const PowerUp = preload("res://PowerUp.gd")
 
-const COLS = 6
-const ROWS = 5
-const BRICK_WIDTH = 57
-const BRICK_HEIGHT = 15
-const PADDING = 10
-const TOP_OFFSET = 80
 const BASE_SPEED = 500.0
 const SPEED_INCREMENT = 40.0
 const MAX_LIVES = 3
@@ -18,6 +12,7 @@ var game_over = false
 var level = 1
 var bricks_remaining = 0
 var lives = MAX_LIVES
+var loader = LevelLoader.new()
 
 @onready var ball = $Ball
 @onready var paddle = $Paddle
@@ -25,6 +20,11 @@ var lives = MAX_LIVES
 @onready var score_label = $HUD/TopBar/ScoreLabel
 @onready var level_label = $HUD/TopBar/LevelLabel
 @onready var lives_label = $HUD/TopBar/LivesLabel
+
+const SLOW_DURATION: float = 8.0
+const SLOW_MULTIPLIER: float = 0.5
+var slow_timer: float = 0.0
+var is_slowed: bool = false
 
 func _ready() -> void:
 	spawn_bricks()
@@ -39,20 +39,12 @@ func update_hud() -> void:
 func spawn_bricks() -> void:
 	for child in get_children():
 		if child is StaticBody2D and child.has_method("hit"):
-			child.queue_free()
-
-	bricks_remaining = COLS * ROWS
-	var total_width = COLS * BRICK_WIDTH + (COLS - 1) * PADDING
-	var start_x = (480 - total_width) / 2 + BRICK_WIDTH / 2
-
-	for row in range(ROWS):
-		for col in range(COLS):
-			var brick = BRICK_SCENE.instantiate()
-			var x = start_x + col * (BRICK_WIDTH + PADDING)
-			var y = TOP_OFFSET + row * (BRICK_HEIGHT + PADDING)
-			brick.position = Vector2(x, y)
-			brick.brick_destroyed.connect(_on_brick_destroyed)
-			add_child(brick)
+			child.queue_free() 
+	bricks_remaining = loader.load_level(level, self)
+	for child in get_children():
+		if child is StaticBody2D and child.has_method("hit"):
+			if not child.brick_destroyed.is_connected(_on_brick_destroyed):
+				child.brick_destroyed.connect(_on_brick_destroyed)
 
 func respawn_ball() -> void:
 	ball.position = Vector2(240, 600)
@@ -71,26 +63,19 @@ func level_clear() -> void:
 	update_hud()
 	print("LEVEL CLEAR! Starting level ", level)
 	respawn_ball()
-	spawn_bricks()
+	call_deferred("spawn_bricks") 
 
 func _on_death_zone_body_entered(body: Node) -> void:
 	if not (body is CharacterBody2D and body.has_method("set_speed")):
 		return
-
 	body.stop()
-
 	if body != ball:
 		body.queue_free()
-
 	await get_tree().process_frame
-
-	# Tarkista onko aktiivisia extrapalloja jäljellä
 	var active_balls = 0
 	for child in get_children():
 		if child is CharacterBody2D and child.has_method("set_speed") and child != ball and child.active:
 			active_balls += 1
-
-	# Jos ei extrapalloja ja alkuperäinen on pysähtynyt
 	if active_balls == 0 and not ball.active:
 		lives -= 1
 		update_hud()
@@ -115,7 +100,6 @@ func restart() -> void:
 	level = 1
 	lives = MAX_LIVES
 	is_slowed = false
-	# Poista vain extrapallot
 	for child in get_children():
 		if child is CharacterBody2D and child.has_method("set_speed") and child != ball:
 			child.queue_free()
@@ -126,12 +110,6 @@ func restart() -> void:
 	respawn_ball()
 	spawn_bricks()
 	update_hud()
-	
-const SLOW_DURATION: float = 8.0
-const SLOW_MULTIPLIER: float = 0.5
-
-var slow_timer: float = 0.0
-var is_slowed: bool = false
 
 func _process(delta: float) -> void:
 	if is_slowed:
@@ -157,7 +135,7 @@ func spawn_extra_ball() -> void:
 	var new_ball = ball_scene.instantiate()
 	new_ball.position = Vector2(240, 600)
 	new_ball.speed = BASE_SPEED + (level - 1) * SPEED_INCREMENT
-	add_child(new_ball)
+	call_deferred("add_child", new_ball)
 	print("Multiball!")
 
 func activate_slow() -> void:

@@ -47,9 +47,8 @@ func spawn_bricks() -> void:
 				child.brick_destroyed.connect(_on_brick_destroyed)
 
 func respawn_ball() -> void:
-	ball.position = Vector2(240, 600)
 	ball.speed = BASE_SPEED + (level - 1) * SPEED_INCREMENT
-	ball.launch()
+	ball.attach_to_paddle(paddle)
 
 func _on_brick_destroyed() -> void:
 	score += 10
@@ -87,6 +86,15 @@ func _on_death_zone_body_entered(body: Node) -> void:
 			print("GAME OVER | Score: ", score, " | Level: ", level)
 
 func _input(event: InputEvent) -> void:
+	# Vapauta pallo napautuksella
+	if ball.attached:
+		if event is InputEventScreenTouch and event.pressed:
+			ball.launch()
+			return
+		elif event is InputEventMouseButton and event.pressed:
+			ball.launch()
+			return
+
 	if not game_over:
 		return
 	if event is InputEventScreenTouch and event.pressed:
@@ -112,6 +120,10 @@ func restart() -> void:
 	update_hud()
 
 func _process(delta: float) -> void:
+	# Pallo seuraa paddlea kun kiinnitetty
+	if ball.attached:
+		ball.position = Vector2(paddle.position.x, paddle.position.y - 25)
+
 	if is_slowed:
 		slow_timer -= delta
 		if slow_timer <= 0:
@@ -120,7 +132,7 @@ func _process(delta: float) -> void:
 func apply_powerup(type: int) -> void:
 	match type:
 		PowerUp.Type.EXPAND_PADDLE:
-			if not paddle.powered_up:  # ← vain jos ei jo aktiivinen
+			if not paddle.powered_up:
 				paddle.activate_expand()
 		PowerUp.Type.MULTIBALL:
 			spawn_extra_ball()
@@ -131,15 +143,22 @@ func apply_powerup(type: int) -> void:
 				lives += 1
 				update_hud()
 				print("Extra life! Lives: ", lives)
-			else:
-				print("Max lives already reached")
+		PowerUp.Type.REVERSE_BALL:
+			reverse_all_balls()
+
+func reverse_all_balls() -> void:
+	for child in get_children():
+		if child is CharacterBody2D and child.has_method("reverse"):
+			child.reverse()
+	print("Reverse Ball!")
 
 func spawn_extra_ball() -> void:
 	var ball_scene = load("res://Ball.tscn")
 	var new_ball = ball_scene.instantiate()
-	new_ball.position = Vector2(240, 600)
+	new_ball.position = Vector2(paddle.position.x, paddle.position.y - 25)
 	new_ball.speed = BASE_SPEED + (level - 1) * SPEED_INCREMENT
-	call_deferred("add_child", new_ball)
+	add_child(new_ball)
+	new_ball.launch()  # ← käynnistä heti
 	print("Multiball!")
 
 func activate_slow() -> void:

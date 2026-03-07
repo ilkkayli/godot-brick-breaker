@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://bdr1x3qp6c6o" path="res://Ball.tscn" id="2_0xm2m"]
 [ext_resource type="Texture2D" uid="uid://cwt5ad3suhrur" path="res://background_v5.png" id="2_1bvp3"]
 [ext_resource type="FontFile" uid="uid://dht3tl6ofdgw5" path="res://assets/fonts/orbitron.ttf" id="5_lquwl"]
+[ext_resource type="Script" uid="uid://duelw5vmlntnt" path="res://CameraShake.gd" id="6_7mycd"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ig7tw"]
 size = Vector2(480, 20)
@@ -85,3 +86,7 @@ theme_override_fonts/font = ExtResource("5_lquwl")
 theme_override_font_sizes/font_size = 20
 text = "Lives: 3
 "
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1692959262 groups=["camera"]]
+position = Vector2(240, 427)
+script = ExtResource("6_7mycd")

@@ -3,7 +3,8 @@
 [ext_resource type="Script" uid="uid://i7ynpahjbuud" path="res://Main.gd" id="1_h2yge"]
 [ext_resource type="PackedScene" uid="uid://bx6se8i20qa2f" path="res://paddle.tscn" id="1_ig7tw"]
 [ext_resource type="PackedScene" uid="uid://bdr1x3qp6c6o" path="res://Ball.tscn" id="2_0xm2m"]
-[ext_resource type="Texture2D" uid="uid://byt27l8r8hcss" path="res://background_v3.png" id="2_1bvp3"]
+[ext_resource type="Texture2D" uid="uid://cwt5ad3suhrur" path="res://background_v5.png" id="2_1bvp3"]
+[ext_resource type="FontFile" uid="uid://dht3tl6ofdgw5" path="res://assets/fonts/orbitron.ttf" id="5_lquwl"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ig7tw"]
 size = Vector2(480, 20)
@@ -65,13 +66,22 @@ theme_override_constants/separation = 20
 
 [node name="ScoreLabel" type="Label" parent="HUD/TopBar" unique_id=1357324826]
 layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.8980392, 1, 1)
+theme_override_fonts/font = ExtResource("5_lquwl")
+theme_override_font_sizes/font_size = 30
 text = "Score: 0"
 
 [node name="LevelLabel" type="Label" parent="HUD/TopBar" unique_id=502985020]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.7019608, 0.53333336, 1, 1)
+theme_override_fonts/font = ExtResource("5_lquwl")
+theme_override_font_sizes/font_size = 20
 text = "Level: 1"
 
 [node name="LivesLabel" type="Label" parent="HUD/TopBar" unique_id=1828455096]
 layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.61960787, 0, 1)
+theme_override_fonts/font = ExtResource("5_lquwl")
+theme_override_font_sizes/font_size = 20
 text = "Lives: 3
 "

@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-const PADDLE_WIDTH: float = 200.0
+const PADDLE_WIDTH: float = 110.0
 const PADDLE_WIDTH_POWERED: float = 320.0
 const POWERUP_DURATION: float = 10.0
 
@@ -9,10 +9,12 @@ var target_x: float = 0.0
 var touch_index: int = -1
 var powered_up: bool = false
 var powerup_timer: float = 0.0
+var base_sprite_scale_x: float = 0.0
 
 func _ready() -> void:
 	screen_width = get_viewport_rect().size.x
 	target_x = global_position.x
+	base_sprite_scale_x = $Sprite2D.scale.x
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
@@ -60,4 +62,11 @@ func deactivate_powerup() -> void:
 
 func _update_shape() -> void:
 	var shape = $CollisionShape2D.shape
-	shape.size.x = get_current_width() / 2.0
+	shape.size.x = get_current_width()
+	print("CollisionShape size.x: ", shape.size.x)
+	print("Sprite scale.x: ", $Sprite2D.scale.x)
+	var sprite = $Sprite2D
+	if powered_up:
+		sprite.scale.x = base_sprite_scale_x * (PADDLE_WIDTH_POWERED / PADDLE_WIDTH)
+	else:
+		sprite.scale.x = base_sprite_scale_x

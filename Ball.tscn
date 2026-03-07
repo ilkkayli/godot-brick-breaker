@@ -16,7 +16,7 @@ script = ExtResource("1_gk6bx")
 shape = SubResource("CircleShape2D_lww6v")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=118217781]
-scale = Vector2(0.08, 0.09)
+scale = Vector2(0.13, 0.14)
 texture = ExtResource("2_lww6v")
 region_enabled = true
 region_rect = Rect2(162.51266, 82.94868, 189.02563, 192.92307)

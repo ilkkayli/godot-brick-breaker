@@ -120,15 +120,19 @@ func _process(delta: float) -> void:
 func apply_powerup(type: int) -> void:
 	match type:
 		PowerUp.Type.EXPAND_PADDLE:
-			paddle.activate_expand()
+			if not paddle.powered_up:  # ← vain jos ei jo aktiivinen
+				paddle.activate_expand()
 		PowerUp.Type.MULTIBALL:
 			spawn_extra_ball()
 		PowerUp.Type.SLOW_BALL:
 			activate_slow()
 		PowerUp.Type.EXTRA_LIFE:
-			lives += 1
-			update_hud()
-			print("Extra life! Lives: ", lives)
+			if lives < MAX_LIVES:
+				lives += 1
+				update_hud()
+				print("Extra life! Lives: ", lives)
+			else:
+				print("Max lives already reached")
 
 func spawn_extra_ball() -> void:
 	var ball_scene = load("res://Ball.tscn")

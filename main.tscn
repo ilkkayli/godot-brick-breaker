@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://i7ynpahjbuud" path="res://Main.gd" id="1_h2yge"]
 [ext_resource type="PackedScene" uid="uid://bx6se8i20qa2f" path="res://paddle.tscn" id="1_ig7tw"]
 [ext_resource type="PackedScene" uid="uid://bdr1x3qp6c6o" path="res://Ball.tscn" id="2_0xm2m"]
+[ext_resource type="Texture2D" uid="uid://byt27l8r8hcss" path="res://background_v3.png" id="2_1bvp3"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ig7tw"]
 size = Vector2(480, 20)
@@ -18,6 +19,11 @@ size = Vector2(480, 20)
 
 [node name="Main" type="Node2D" unique_id=947360514]
 script = ExtResource("1_h2yge")
+
+[node name="Background" type="Sprite2D" parent="." unique_id=402750899]
+position = Vector2(240, 427)
+scale = Vector2(0.469, 0.556)
+texture = ExtResource("2_1bvp3")
 
 [node name="Paddle" parent="." unique_id=1417900897 instance=ExtResource("1_ig7tw")]
 position = Vector2(240, 780)

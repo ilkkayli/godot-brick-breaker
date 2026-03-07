@@ -5,17 +5,19 @@ signal brick_destroyed
 
 const POWERUP_SCENE = preload("res://PowerUp.tscn")
 const PowerUp = preload("res://PowerUp.gd")
+const SPRITESHEET = preload("res://spritesheet.png")
 const POWERUP_CHANCE = 0.2
 
 enum Type { NORMAL, STRONG, UNBREAKABLE, EXPLOSIVE }
 
-const COLORS = {
-	Type.NORMAL:      Color(0.2, 0.6, 1.0),   # sininen
-	Type.STRONG:      Color(1.0, 0.4, 0.0),   # oranssi
-	Type.UNBREAKABLE: Color(0.4, 0.4, 0.4),   # harmaa
-	Type.EXPLOSIVE:   Color(0.8, 0.0, 0.8)    # violetti
+# Region-arvot jokaiselle tiilityypille
+const REGIONS = {
+	Type.NORMAL:      Rect2(788, 351, 310, 200),
+	Type.STRONG:      Rect2(785, 578, 310, 200),
+	Type.UNBREAKABLE: Rect2(465, 576, 310, 200),
+	Type.EXPLOSIVE:   Rect2(136, 577, 310, 200)
 }
-const DAMAGED_COLOR = Color(0.8, 0.2, 0.2)   # punainen – vahva tiili vaurioitunut
+const DAMAGED_REGION = Rect2(1096, 351, 310, 200)
 
 var health: int = 1
 var type: Type = Type.NORMAL
@@ -24,34 +26,33 @@ var is_destroyed: bool = false
 func setup(new_type: Type) -> void:
 	type = new_type
 	match type:
-		Type.NORMAL:
-			health = 1
-		Type.STRONG:
-			health = 2
-		Type.UNBREAKABLE:
-			health = -1  # ei koskaan nolla
-		Type.EXPLOSIVE:
-			health = 1
-	_update_color()
+		Type.NORMAL:      health = 1
+		Type.STRONG:      health = 2
+		Type.UNBREAKABLE: health = -1
+		Type.EXPLOSIVE:   health = 1
+	_update_sprite()
 
-func _update_color() -> void:
-	var cr = $ColorRect
+func _update_sprite() -> void:
+	var sprite = $Sprite2D
+	var atlas = AtlasTexture.new()
+	atlas.atlas = SPRITESHEET
 	if type == Type.STRONG and health == 1:
-		cr.color = DAMAGED_COLOR
+		atlas.region = DAMAGED_REGION
 	else:
-		cr.color = COLORS[type]
+		atlas.region = REGIONS[type]
+	sprite.texture = atlas
 
 func hit() -> void:
 	if type == Type.UNBREAKABLE:
 		return
-	if is_destroyed:  
+	if is_destroyed:
 		return
 	health -= 1
 	if health <= 0:
-		is_destroyed = true  
+		is_destroyed = true
 		_on_destroyed()
 	else:
-		_update_color()
+		_update_sprite()
 
 func _on_destroyed() -> void:
 	if type == Type.EXPLOSIVE:
@@ -67,12 +68,10 @@ func _on_destroyed() -> void:
 
 func _explode() -> void:
 	var neighbors = [
-		Vector2(0, -1),  # ylös
-		Vector2(0,  1),  # alas
-		Vector2(-1, 0),  # vasemmalle
-		Vector2(1,  0)   # oikealle
+		Vector2(0, -1), Vector2(0, 1),
+		Vector2(-1, 0), Vector2(1, 0)
 	]
-	var brick_size = Vector2(57 + 10, 15 + 10)  # BRICK_WIDTH + PADDING
+	var brick_size = Vector2(57 + 10, 15 + 10)
 	for dir in neighbors:
 		var target_pos = global_position + dir * brick_size
 		for child in get_parent().get_children():

@@ -34,46 +34,38 @@ func load_level(level_number: int, parent: Node) -> int:
 func _spawn_bricks(lines: Array, parent: Node) -> int:
 	var breakable_count = 0
 	var rows = lines.size()
-
 	var max_cols = 0
 	for line in lines:
 		if line.length() > max_cols:
 			max_cols = line.length()
-
 	var screen_w = 480.0
 	var margin = 10.0
-	var gap = 6.0
-	var brick_w = (screen_w - margin * 2 - gap * (max_cols - 1)) / max_cols
-	var brick_h = brick_w * 0.28
+	var gap_x = 6.0
+	var gap_y = 1.0
+	var brick_w = (screen_w - margin * 2 - gap_x * (max_cols - 1)) / max_cols
+	var brick_h = brick_w * 1.0
 	var start_x = margin + brick_w / 2.0
-
 	for row in range(rows):
 		var line = lines[row]
 		for col in range(line.length()):
 			var ch = line[col]
 			if ch == ".":
 				continue
-
 			var brick_type = _char_to_type(ch)
 			if brick_type == -1:
 				continue
-
 			var brick = BRICK_SCENE.instantiate()
-			var x = start_x + col * (brick_w + gap)
-			var y = TOP_OFFSET + row * (brick_h + gap)
+			var x = start_x + col * (brick_w + gap_x)
+			var y = TOP_OFFSET + row * (brick_h + gap_y)
 			brick.position = Vector2(x, y)
 			parent.add_child(brick)
 			brick.setup(brick_type)
-
+			var sprite = brick.get_node("Sprite2D")
+			sprite.scale = Vector2(brick_w / 310.0, brick_h / 200.0)
 			var shape = brick.get_node("CollisionShape2D").shape
 			shape.size = Vector2(brick_w / 2.0, brick_h / 2.0)
-			var cr = brick.get_node("ColorRect")
-			cr.size = Vector2(brick_w, brick_h)
-			cr.position = Vector2(-brick_w / 2.0, -brick_h / 2.0)
-
 			if brick_type != Brick.Type.UNBREAKABLE:
 				breakable_count += 1
-
 	return breakable_count
 
 func _char_to_type(ch: String) -> int:

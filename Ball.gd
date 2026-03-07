@@ -32,6 +32,3 @@ func _physics_process(delta: float) -> void:
 		var collider = collision.get_collider()
 		if collider.has_method("hit"):
 			collider.hit()
-
-func _draw() -> void:
-	draw_circle(Vector2.ZERO, RADIUS, Color.WHITE)

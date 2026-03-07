@@ -11,8 +11,4 @@ script = ExtResource("1_jfaf4")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1516414586]
 shape = SubResource("RectangleShape2D_73kpp")
 
-[node name="ColorRect" type="ColorRect" parent="." unique_id=1107516558]
-offset_left = -28.0
-offset_top = -7.0
-offset_right = 29.0
-offset_bottom = 8.0
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=436773580]

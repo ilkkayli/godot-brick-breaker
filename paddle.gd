@@ -61,6 +61,3 @@ func deactivate_powerup() -> void:
 func _update_shape() -> void:
 	var shape = $CollisionShape2D.shape
 	shape.size.x = get_current_width() / 2.0
-	var cr = $ColorRect
-	cr.size.x = get_current_width()
-	cr.position.x = -get_current_width() / 2.0

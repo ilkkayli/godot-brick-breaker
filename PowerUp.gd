@@ -3,18 +3,28 @@ extends Area2D
 enum Type { EXPAND_PADDLE, MULTIBALL, SLOW_BALL, EXTRA_LIFE }
 
 const FALL_SPEED: float = 150.0
-const COLORS = {
-	Type.EXPAND_PADDLE: Color.YELLOW,
-	Type.MULTIBALL: Color.CYAN,
-	Type.SLOW_BALL: Color.GREEN,
-	Type.EXTRA_LIFE: Color.RED
+const SPRITESHEET = preload("res://spritesheet.png")
+
+const REGIONS = {
+	Type.EXPAND_PADDLE: Rect2(808, 129, 280, 200),
+	Type.MULTIBALL:     Rect2(1103, 120, 280, 200),
+	Type.SLOW_BALL:     Rect2(152, 344, 280, 200),
+	Type.EXTRA_LIFE:    Rect2(477, 345, 280, 200)
 }
 
 var type: Type = Type.EXPAND_PADDLE
 
 func _ready() -> void:
-	$ColorRect.color = COLORS[type]
+	_update_sprite()
 	body_entered.connect(_on_body_entered)
+
+func _update_sprite() -> void:
+	var sprite = $Sprite2D
+	var atlas = AtlasTexture.new()
+	atlas.atlas = SPRITESHEET
+	atlas.region = REGIONS[type]
+	sprite.texture = atlas
+	sprite.scale = Vector2(60.0 / 280.0, 60.0 / 280.0)
 
 func _physics_process(delta: float) -> void:
 	position.y += FALL_SPEED * delta

@@ -1,6 +1,6 @@
 extends Control
 
-const MAIN_SCENE = "res://Main.tscn"
+const MAIN_SCENE = "res://main.tscn"
 
 func _ready() -> void:
 	var high_score = load_high_score()
@@ -10,7 +10,8 @@ func _ready() -> void:
 	$VBoxContainer/QuitButton.pressed.connect(_on_quit_pressed)
 
 func _on_play_pressed() -> void:
-	get_tree().change_scene_to_file(MAIN_SCENE)
+	print("Play pressed")
+	get_tree().call_deferred("change_scene_to_file", "res://main.tscn")
 
 func _on_settings_pressed() -> void:
 	print("Settings - toteutetaan myöhemmin")

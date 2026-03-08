@@ -2,11 +2,12 @@
 .import/
 .export/
 .export.cfg
-
-# Godot cache
 .godot/
+android/build/
+*.aab
+*.apk
 
-# Mono (jos joskus käytät)
+# Mono
 .mono/
 
 # OS

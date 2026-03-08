@@ -26,6 +26,7 @@ var loader = LevelLoader.new()
 @onready var snd_powerup = $SndPowerup
 @onready var snd_explosion = $SndExplosion
 @onready var snd_game_over = $SndGameOver
+@onready var menu_button = $HUD/MenuButton
 
 const SLOW_DURATION: float = 8.0
 const SLOW_MULTIPLIER: float = 0.5
@@ -36,6 +37,10 @@ func _ready() -> void:
 	spawn_bricks()
 	death_zone.body_entered.connect(_on_death_zone_body_entered)
 	update_hud()
+	menu_button.pressed.connect(_on_menu_pressed)
+
+func _on_menu_pressed() -> void:
+	get_tree().change_scene_to_file("res://MainMenu.tscn")
 
 func update_hud() -> void:
 	score_label.text = "Score: " + str(score)
@@ -89,6 +94,7 @@ func _on_death_zone_body_entered(body: Node) -> void:
 			respawn_ball()
 		else:
 			game_over = true
+			save_high_score() 
 			snd_game_over.play()
 			print("GAME OVER | Score: ", score, " | Level: ", level)
 
@@ -184,3 +190,18 @@ func _set_all_ball_speeds(new_speed: float) -> void:
 	for child in get_children():
 		if child is CharacterBody2D and child.has_method("set_speed"):
 			child.set_speed(new_speed)
+			
+func save_high_score() -> void:
+	var current_best = load_high_score()
+	if score > current_best:
+		var file = FileAccess.open("user://save.dat", FileAccess.WRITE)
+		file.store_32(score)
+		file.close()
+
+func load_high_score() -> int:
+	if FileAccess.file_exists("user://save.dat"):
+		var file = FileAccess.open("user://save.dat", FileAccess.READ)
+		var s = file.get_32()
+		file.close()
+		return s
+	return 0

@@ -92,6 +92,12 @@ theme_override_font_sizes/font_size = 20
 text = "Lives: 3
 "
 
+[node name="MenuButton" type="Button" parent="HUD" unique_id=2022574187]
+offset_right = 8.0
+offset_bottom = 8.0
+theme_override_font_sizes/font_size = 24
+text = "≡"
+
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1692959262 groups=["camera"]]
 position = Vector2(240, 427)
 script = ExtResource("6_7mycd")

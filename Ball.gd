@@ -36,6 +36,11 @@ func _physics_process(delta: float) -> void:
 		var collider = collision.get_collider()
 		if collider.has_method("hit"):
 			collider.hit()
+			# Brick break -ääni soitetaan Brick.gd:ssä
+		elif collider.is_in_group("paddle"):
+			get_tree().get_first_node_in_group("main").snd_paddle_hit.play()
+		else:
+			get_tree().get_first_node_in_group("main").snd_wall_bounce.play()
 
 func reverse() -> void:
 	velocity = -velocity

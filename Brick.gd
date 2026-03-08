@@ -56,8 +56,12 @@ func hit() -> void:
 
 func _on_destroyed() -> void:
 	_spawn_particles()
+	var main = get_tree().get_first_node_in_group("main")
 	if type == Type.EXPLOSIVE:
+		main.snd_explosion.play()
 		_explode()
+	else:
+		main.snd_brick_break.play()
 	if randf() < POWERUP_CHANCE:
 		var powerup = POWERUP_SCENE.instantiate()
 		powerup.position = global_position

@@ -20,6 +20,12 @@ var loader = LevelLoader.new()
 @onready var score_label = $HUD/TopBar/ScoreLabel
 @onready var level_label = $HUD/TopBar/LevelLabel
 @onready var lives_label = $HUD/TopBar/LivesLabel
+@onready var snd_paddle_hit = $SndPaddleHit
+@onready var snd_brick_break = $SndBrickBreak
+@onready var snd_wall_bounce = $SndWallBounce
+@onready var snd_powerup = $SndPowerup
+@onready var snd_explosion = $SndExplosion
+@onready var snd_game_over = $SndGameOver
 
 const SLOW_DURATION: float = 8.0
 const SLOW_MULTIPLIER: float = 0.5
@@ -83,6 +89,7 @@ func _on_death_zone_body_entered(body: Node) -> void:
 			respawn_ball()
 		else:
 			game_over = true
+			snd_game_over.play()
 			print("GAME OVER | Score: ", score, " | Level: ", level)
 
 func _input(event: InputEvent) -> void:
@@ -130,6 +137,7 @@ func _process(delta: float) -> void:
 			deactivate_slow()
 
 func apply_powerup(type: int) -> void:
+	snd_powerup.play()
 	match type:
 		PowerUp.Type.EXPAND_PADDLE:
 			if not paddle.powered_up:

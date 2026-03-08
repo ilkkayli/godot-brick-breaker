@@ -32,7 +32,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0, 0.8980392, 1, 1)
 theme_override_fonts/font = ExtResource("2_h7a2f")
 theme_override_font_sizes/font_size = 32
-text = "BRICK BREAKER"
+text = "Orbion"
 horizontal_alignment = 1
 
 [node name="HighScoreLabel" type="Label" parent="VBoxContainer" unique_id=565849882]

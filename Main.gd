@@ -27,6 +27,7 @@ var loader = LevelLoader.new()
 @onready var snd_explosion = $SndExplosion
 @onready var snd_game_over = $SndGameOver
 @onready var menu_button = $HUD/MenuButton
+@onready var game_over_screen = $GameOverLayer/GameOver
 
 const SLOW_DURATION: float = 8.0
 const SLOW_MULTIPLIER: float = 0.5
@@ -38,6 +39,8 @@ func _ready() -> void:
 	death_zone.body_entered.connect(_on_death_zone_body_entered)
 	update_hud()
 	menu_button.pressed.connect(_on_menu_pressed)
+	game_over_screen.restart_game.connect(_on_game_over_restart)
+	game_over_screen.watch_ad.connect(_on_watch_ad)
 
 func _on_menu_pressed() -> void:
 	get_tree().change_scene_to_file("res://MainMenu.tscn")
@@ -94,12 +97,13 @@ func _on_death_zone_body_entered(body: Node) -> void:
 			respawn_ball()
 		else:
 			game_over = true
-			save_high_score() 
+			save_high_score()
 			snd_game_over.play()
+			game_over_screen.setup(score, load_high_score())
+			game_over_screen.visible = true
 			print("GAME OVER | Score: ", score, " | Level: ", level)
 
 func _input(event: InputEvent) -> void:
-	# Vapauta pallo napautuksella
 	if ball.attached:
 		if event is InputEventScreenTouch and event.pressed:
 			ball.launch()
@@ -107,13 +111,6 @@ func _input(event: InputEvent) -> void:
 		elif event is InputEventMouseButton and event.pressed:
 			ball.launch()
 			return
-
-	if not game_over:
-		return
-	if event is InputEventScreenTouch and event.pressed:
-		restart()
-	elif event is InputEventMouseButton and event.pressed:
-		restart()
 
 func restart() -> void:
 	game_over = false
@@ -205,3 +202,15 @@ func load_high_score() -> int:
 		file.close()
 		return s
 	return 0
+	
+func _on_game_over_restart() -> void:
+	game_over_screen.visible = false
+	restart()
+
+func _on_watch_ad() -> void:
+	# Rewarded ad logiikka tulee tähän myöhemmin
+	game_over_screen.visible = false
+	lives = 1
+	game_over = false
+	respawn_ball()
+	update_hud()

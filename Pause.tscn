@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://d05jp7ucmmkex"]
+
+[ext_resource type="Script" uid="uid://u5fdq561eiwq" path="res://Pause.gd" id="1_alh12"]
+[ext_resource type="FontFile" uid="uid://dht3tl6ofdgw5" path="res://assets/fonts/orbitron.ttf" id="1_sn2qd"]
+
+[node name="Pause" type="Control" unique_id=609650561]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_alh12")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1389138674]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=591413217]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="PauseLabel" type="Label" parent="VBoxContainer" unique_id=652661224]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7019608, 0.53333336, 1, 1)
+theme_override_fonts/font = ExtResource("1_sn2qd")
+theme_override_font_sizes/font_size = 36
+text = "PAUSED"
+
+[node name="ResumeButton" type="Button" parent="VBoxContainer" unique_id=1554587379]
+layout_mode = 2
+text = "RESUME"
+
+[node name="MenuButton" type="Button" parent="VBoxContainer" unique_id=1282849209]
+layout_mode = 2
+text = "MAIN MENU"

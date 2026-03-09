@@ -1,0 +1,64 @@
+[gd_scene format=3 uid="uid://cmpcbyc0hvxm6"]
+
+[ext_resource type="Script" uid="uid://daq8c6f4vm3j7" path="res://Settings.gd" id="1_2fv1l"]
+[ext_resource type="FontFile" uid="uid://dht3tl6ofdgw5" path="res://assets/fonts/orbitron.ttf" id="1_bvb5x"]
+
+[node name="Settings" type="Control" unique_id=909325834]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_2fv1l")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1656146705]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1368675656]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="SettingsLabel" type="Label" parent="VBoxContainer" unique_id=564627973]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7019608, 0.53333336, 1, 1)
+theme_override_fonts/font = ExtResource("1_bvb5x")
+theme_override_font_sizes/font_size = 32
+text = "SETTINGS"
+
+[node name="MusicLabel" type="Label" parent="VBoxContainer" unique_id=1170158286]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_bvb5x")
+theme_override_font_sizes/font_size = 18
+text = "Music Volume"
+
+[node name="MusicSlider" type="HSlider" parent="VBoxContainer" unique_id=1105556109]
+layout_mode = 2
+max_value = 1.0
+step = 0.05
+value = 0.8
+
+[node name="MusicToggle" type="CheckButton" parent="VBoxContainer" unique_id=1997385731]
+layout_mode = 2
+text = "Music On"
+
+[node name="SfxLabel" type="Label" parent="VBoxContainer" unique_id=196470336]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_bvb5x")
+theme_override_font_sizes/font_size = 18
+text = "SFX Volume"
+
+[node name="SfxSlider" type="HSlider" parent="VBoxContainer" unique_id=648665937]
+layout_mode = 2
+max_value = 1.0
+step = 0.05
+value = 1.0
+
+[node name="SfxToggle" type="CheckButton" parent="VBoxContainer" unique_id=1463748767]
+layout_mode = 2
+text = "SFX On"
+
+[node name="CloseButton" type="Button" parent="VBoxContainer" unique_id=1253311930]
+layout_mode = 2
+text = "CLOSE"

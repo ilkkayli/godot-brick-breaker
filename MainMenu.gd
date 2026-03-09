@@ -2,19 +2,28 @@ extends Control
 
 const MAIN_SCENE = "res://main.tscn"
 
+@onready var settings_screen = $SettingsLayer/Settings
+
 func _ready() -> void:
 	var high_score = load_high_score()
 	$VBoxContainer/HighScoreLabel.text = "Best: " + str(high_score)
 	$VBoxContainer/PlayButton.pressed.connect(_on_play_pressed)
 	$VBoxContainer/SettingsButton.pressed.connect(_on_settings_pressed)
 	$VBoxContainer/QuitButton.pressed.connect(_on_quit_pressed)
+	settings_screen.closed.connect(_on_settings_closed)
 
 func _on_play_pressed() -> void:
 	print("Play pressed")
 	get_tree().call_deferred("change_scene_to_file", "res://main.tscn")
 
+func _change_to_main() -> void:
+	get_tree().change_scene_to_file("res://main.tscn")
+
 func _on_settings_pressed() -> void:
-	print("Settings - toteutetaan myöhemmin")
+	settings_screen.visible = true
+
+func _on_settings_closed() -> void:
+	settings_screen.visible = false
 
 func _on_quit_pressed() -> void:
 	get_tree().quit()

@@ -3,6 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://cwt5ad3suhrur" path="res://background_v5.png" id="1_eiy7p"]
 [ext_resource type="Script" uid="uid://cl0xi4g16cyuf" path="res://MainMenu.gd" id="1_h7a2f"]
 [ext_resource type="FontFile" uid="uid://dht3tl6ofdgw5" path="res://assets/fonts/orbitron.ttf" id="2_h7a2f"]
+[ext_resource type="PackedScene" uid="uid://cmpcbyc0hvxm6" path="res://Settings.tscn" id="4_qoqlk"]
 
 [node name="MainMenu" type="Control" unique_id=665480408]
 layout_mode = 3
@@ -63,3 +64,8 @@ layout_mode = 2
 theme_override_fonts/font = ExtResource("2_h7a2f")
 theme_override_font_sizes/font_size = 20
 text = "QUIT"
+
+[node name="SettingsLayer" type="CanvasLayer" parent="." unique_id=1109185967]
+
+[node name="Settings" parent="SettingsLayer" unique_id=909325834 instance=ExtResource("4_qoqlk")]
+visible = false

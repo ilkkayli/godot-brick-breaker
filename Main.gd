@@ -27,11 +27,12 @@ var loader = LevelLoader.new()
 @onready var snd_powerup = $SndPowerup
 @onready var snd_explosion = $SndExplosion
 @onready var snd_game_over = $SndGameOver
-@onready var menu_button = $HUD/MenuButton
+@onready var menu_button = $HUD/TopBar/MenuButton  
 @onready var game_over_screen = $GameOverLayer/GameOver
 @onready var music_player = $MusicPlayer
 @onready var pause_screen = $PauseLayer/Pause
 @onready var pause_button = $HUD/TopBar/PauseButton
+@onready var confirm_dialog = $ConfirmLayer/ConfirmDialog
 
 const SLOW_DURATION: float = 8.0
 const SLOW_MULTIPLIER: float = 0.5
@@ -50,10 +51,23 @@ func _ready() -> void:
 	game_over_screen.watch_ad.connect(_on_watch_ad)
 	pause_screen.resume_game.connect(_on_resume_pressed)
 	pause_screen.go_to_menu.connect(_on_menu_pressed)
+	pause_button.process_mode = Node.PROCESS_MODE_ALWAYS
+	$ConfirmLayer/ConfirmDialog/PanelContainer/VBoxContainer/HBoxContainer/YesButton.pressed.connect(_on_confirm_yes)
+	$ConfirmLayer/ConfirmDialog/PanelContainer/VBoxContainer/HBoxContainer/NoButton.pressed.connect(_on_confirm_no)
+	confirm_dialog.process_mode = Node.PROCESS_MODE_ALWAYS
 
 func _on_menu_pressed() -> void:
+	get_tree().paused = true
+	confirm_dialog.visible = true
+	
+func _on_confirm_yes() -> void:
+	confirm_dialog.visible = false
 	get_tree().paused = false
 	get_tree().call_deferred("change_scene_to_file", "res://MainMenu.tscn")
+
+func _on_confirm_no() -> void:
+	confirm_dialog.visible = false
+	get_tree().paused = false
 
 func update_hud() -> void:
 	score_label.text = "Score: " + str(score)
@@ -235,8 +249,12 @@ func _on_music_finished() -> void:
 	music_player.play()
 
 func _on_pause_pressed() -> void:
-	get_tree().paused = true
-	pause_screen.visible = true
+	if get_tree().paused:
+		get_tree().paused = false
+		pause_button.text = "⏸"
+	else:
+		get_tree().paused = true
+		pause_button.text = "▶"
 
 func _on_resume_pressed() -> void:
 	get_tree().paused = false

@@ -14,9 +14,7 @@
 [ext_resource type="AudioStream" uid="uid://c1hxcs7vdg37f" path="res://assets/sounds/game_over.wav" id="11_ycdy4"]
 [ext_resource type="PackedScene" uid="uid://d05qjip83lgwf" path="res://GameOver.tscn" id="12_dg77c"]
 [ext_resource type="AudioStream" uid="uid://cci7ob1fvdy2a" path="res://assets/music/background.mp3" id="14_w48qg"]
-[ext_resource type="PackedScene" uid="uid://b20k248imye5m" path="res://LevelComplete.tscn" id="15_yaehf"]
 [ext_resource type="PackedScene" uid="uid://d05jp7ucmmkex" path="res://Pause.tscn" id="16_074og"]
-[ext_resource type="PackedScene" uid="uid://cmpcbyc0hvxm6" path="res://Settings.tscn" id="17_cegan"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ig7tw"]
 size = Vector2(480, 20)
@@ -148,17 +146,7 @@ volume_db = -15.088
 autoplay = true
 bus = &"Music"
 
-[node name="LevelCompleteLayer" type="CanvasLayer" parent="." unique_id=1941775509]
-visible = false
-
-[node name="LevelComplete" parent="LevelCompleteLayer" unique_id=2035666034 instance=ExtResource("15_yaehf")]
-
 [node name="PauseLayer" type="CanvasLayer" parent="." unique_id=199408404]
 visible = false
 
 [node name="Pause" parent="PauseLayer" unique_id=609650561 instance=ExtResource("16_074og")]
-
-[node name="SettingsLayer" type="CanvasLayer" parent="." unique_id=1425055118]
-visible = false
-
-[node name="Settings" parent="SettingsLayer" unique_id=909325834 instance=ExtResource("17_cegan")]

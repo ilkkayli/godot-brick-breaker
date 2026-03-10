@@ -10,7 +10,6 @@ func _ready() -> void:
 	$VBoxContainer/PlayButton.pressed.connect(_on_play_pressed)
 	$VBoxContainer/SettingsButton.pressed.connect(_on_settings_pressed)
 	$VBoxContainer/QuitButton.pressed.connect(_on_quit_pressed)
-	settings_screen.closed.connect(_on_settings_closed)
 
 func _on_play_pressed() -> void:
 	print("Play pressed")
@@ -20,7 +19,7 @@ func _change_to_main() -> void:
 	get_tree().change_scene_to_file("res://main.tscn")
 
 func _on_settings_pressed() -> void:
-	settings_screen.visible = true
+	get_tree().call_deferred("change_scene_to_file", "res://Settings.tscn")
 
 func _on_settings_closed() -> void:
 	settings_screen.visible = false

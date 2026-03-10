@@ -1,7 +1,8 @@
-[gd_scene format=3 uid="uid://cmpcbyc0hvxm6"]
+[gd_scene format=3 uid="uid://b70b4rwa6minf"]
 
 [ext_resource type="Script" uid="uid://daq8c6f4vm3j7" path="res://Settings.gd" id="1_2fv1l"]
 [ext_resource type="FontFile" uid="uid://dht3tl6ofdgw5" path="res://assets/fonts/orbitron.ttf" id="1_bvb5x"]
+[ext_resource type="Texture2D" uid="uid://cwt5ad3suhrur" path="res://background_v5.png" id="2_mx4kw"]
 
 [node name="Settings" type="Control" unique_id=909325834]
 layout_mode = 3
@@ -10,15 +11,25 @@ offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("1_2fv1l")
 
-[node name="Background" type="ColorRect" parent="." unique_id=1656146705]
+[node name="Background" type="TextureRect" parent="." unique_id=300596430]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_right = 1024.0
+offset_bottom = 1536.0
+texture = ExtResource("2_mx4kw")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1368675656]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 70.0
+offset_top = 157.0
+offset_right = 370.0
+offset_bottom = 657.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="SettingsLabel" type="Label" parent="VBoxContainer" unique_id=564627973]
 layout_mode = 2

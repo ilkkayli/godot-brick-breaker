@@ -2,19 +2,22 @@
 
 [ext_resource type="FontFile" uid="uid://dht3tl6ofdgw5" path="res://assets/fonts/orbitron.ttf" id="1_ibk7c"]
 [ext_resource type="Script" uid="uid://c1lg36ubeanqt" path="res://LevelComplete.gd" id="1_qtjg1"]
+[ext_resource type="Texture2D" uid="uid://cwt5ad3suhrur" path="res://background_v5.png" id="2_b04fo"]
 
 [node name="LevelComplete" type="Control" unique_id=2035666034]
 layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_qtjg1")
 
-[node name="Background" type="ColorRect" parent="." unique_id=1539347447]
+[node name="Background" type="TextureRect" parent="." unique_id=1627013378]
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
-color = Color(0, 0, 0, 1)
+texture = ExtResource("2_b04fo")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1467023021]
 custom_minimum_size = Vector2(300, 400)

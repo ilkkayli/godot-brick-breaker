@@ -1,7 +1,5 @@
 extends Control
 
-signal closed
-
 func _ready() -> void:
 	$VBoxContainer/CloseButton.pressed.connect(_on_close_pressed)
 	$VBoxContainer/MusicSlider.value_changed.connect(_on_music_volume_changed)
@@ -44,7 +42,7 @@ func _apply_music(volume: float, enabled: bool) -> void:
 
 func _apply_sfx(volume: float, enabled: bool) -> void:
 	var db = linear_to_db(volume) if enabled else -80.0
-	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("SFX"), db)
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Sfx"), db)
 
 func _on_close_pressed() -> void:
-	closed.emit()
+	get_tree().call_deferred("change_scene_to_file", "res://MainMenu.tscn")

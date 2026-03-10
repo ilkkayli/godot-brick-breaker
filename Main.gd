@@ -2,6 +2,7 @@ extends Node2D
 
 const BRICK_SCENE = preload("res://Brick.tscn")
 const PowerUp = preload("res://PowerUp.gd")
+const LevelComplete = preload("res://LevelComplete.gd")
 
 const BASE_SPEED = 500.0
 const SPEED_INCREMENT = 40.0
@@ -29,9 +30,7 @@ var loader = LevelLoader.new()
 @onready var menu_button = $HUD/MenuButton
 @onready var game_over_screen = $GameOverLayer/GameOver
 @onready var music_player = $MusicPlayer
-@onready var level_complete_screen = $LevelCompleteLayer/LevelComplete
 @onready var pause_screen = $PauseLayer/Pause
-@onready var settings_screen = $SettingsLayer/Settings
 @onready var pause_button = $HUD/TopBar/PauseButton
 
 const SLOW_DURATION: float = 8.0
@@ -40,6 +39,8 @@ var slow_timer: float = 0.0
 var is_slowed: bool = false
 
 func _ready() -> void:
+	level = SaveManager.get_setting("current_level", 1)
+	score = SaveManager.get_setting("current_score", 0)
 	spawn_bricks()
 	death_zone.body_entered.connect(_on_death_zone_body_entered)
 	update_hud()
@@ -47,11 +48,8 @@ func _ready() -> void:
 	pause_button.pressed.connect(_on_pause_pressed)
 	game_over_screen.restart_game.connect(_on_game_over_restart)
 	game_over_screen.watch_ad.connect(_on_watch_ad)
-	level_complete_screen.next_level.connect(_on_level_complete_next)
-	level_complete_screen.go_to_menu.connect(_on_menu_pressed)
 	pause_screen.resume_game.connect(_on_resume_pressed)
 	pause_screen.go_to_menu.connect(_on_menu_pressed)
-	settings_screen.closed.connect(_on_settings_closed)
 
 func _on_menu_pressed() -> void:
 	get_tree().paused = false
@@ -87,8 +85,11 @@ func level_clear() -> void:
 	level += 1
 	update_hud()
 	ball.stop()
-	level_complete_screen.setup(level, score)
-	level_complete_screen.visible = true
+	SaveManager.set_setting("current_level", level)
+	SaveManager.set_setting("current_score", score)
+	LevelComplete.current_level = level
+	LevelComplete.current_score = score
+	get_tree().call_deferred("change_scene_to_file", "res://LevelComplete.tscn")
 
 func _on_death_zone_body_entered(body: Node) -> void:
 	if not (body is CharacterBody2D and body.has_method("set_speed")):
@@ -130,6 +131,8 @@ func restart() -> void:
 	level = 1
 	lives = MAX_LIVES
 	is_slowed = false
+	SaveManager.set_setting("current_level", 1)
+	SaveManager.set_setting("current_score", 0)
 	for child in get_children():
 		if child is CharacterBody2D and child.has_method("set_speed") and child != ball:
 			child.queue_free()
@@ -229,11 +232,6 @@ func _on_watch_ad() -> void:
 	
 func _on_music_finished() -> void:
 	music_player.play()
-	
-func _on_level_complete_next() -> void:
-	level_complete_screen.visible = false
-	respawn_ball()
-	call_deferred("spawn_bricks")
 
 func _on_pause_pressed() -> void:
 	get_tree().paused = true
@@ -242,6 +240,3 @@ func _on_pause_pressed() -> void:
 func _on_resume_pressed() -> void:
 	get_tree().paused = false
 	pause_screen.visible = false
-
-func _on_settings_closed() -> void:
-	settings_screen.visible = false

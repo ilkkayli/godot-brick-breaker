@@ -32,15 +32,28 @@ func _physics_process(delta: float) -> void:
 		return
 	var collision = move_and_collide(velocity * delta)
 	if collision:
-		velocity = velocity.bounce(collision.get_normal())
 		var collider = collision.get_collider()
 		if collider.has_method("hit"):
+			velocity = velocity.bounce(collision.get_normal())
 			collider.hit()
-			# Brick break -ääni soitetaan Brick.gd:ssä
 		elif collider.is_in_group("paddle"):
-			get_tree().get_first_node_in_group("main").snd_paddle_hit.play()
+			_bounce_off_paddle(collider, collision)
 		else:
-			get_tree().get_first_node_in_group("main").snd_wall_bounce.play()
+			velocity = velocity.bounce(collision.get_normal())
+
+func _bounce_off_paddle(paddle: Node, collision: KinematicCollision2D) -> void:
+	# Laske osumakohta suhteessa paddlen keskipisteeseen (-1 = vasen reuna, 1 = oikea reuna)
+	var paddle_half = paddle.get_current_width() / 2.0
+	var hit_pos = (global_position.x - paddle.global_position.x) / paddle_half
+	hit_pos = clamp(hit_pos, -1.0, 1.0)
+	
+	# Laske kimpoamiskulma osumakohdan mukaan
+	# Keskeltä = suoraan ylös, reunoilta = jyrkempi kulma
+	var max_angle = 65.0  # maksimikimpoamiskulma reunoilta
+	var angle = hit_pos * deg_to_rad(max_angle)
+	
+	# Aseta uusi velocity — aina ylöspäin
+	velocity = Vector2(sin(angle), -cos(angle)).normalized() * speed
 
 func reverse() -> void:
 	velocity = -velocity

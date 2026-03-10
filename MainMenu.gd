@@ -12,8 +12,7 @@ func _ready() -> void:
 	$VBoxContainer/QuitButton.pressed.connect(_on_quit_pressed)
 
 func _on_play_pressed() -> void:
-	print("Play pressed")
-	get_tree().call_deferred("change_scene_to_file", "res://main.tscn")
+	get_tree().call_deferred("change_scene_to_file", "res://LevelSelect.tscn")
 
 func _change_to_main() -> void:
 	get_tree().change_scene_to_file("res://main.tscn")

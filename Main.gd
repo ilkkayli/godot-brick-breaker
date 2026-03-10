@@ -85,6 +85,7 @@ func level_clear() -> void:
 	level += 1
 	update_hud()
 	ball.stop()
+	SaveManager.update_highest_level(level)
 	SaveManager.set_setting("current_level", level)
 	SaveManager.set_setting("current_score", score)
 	LevelComplete.current_level = level

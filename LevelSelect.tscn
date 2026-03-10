@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://ch8ny7s5plexl"]
+
+[ext_resource type="Texture2D" uid="uid://cwt5ad3suhrur" path="res://background_v5.png" id="1_ardn0"]
+[ext_resource type="Script" uid="uid://b8oq2yo01ta4u" path="res://LevelSelect.gd" id="1_q3t17"]
+[ext_resource type="FontFile" uid="uid://dht3tl6ofdgw5" path="res://assets/fonts/orbitron.ttf" id="2_q3t17"]
+
+[node name="Control" type="Control" unique_id=111604693]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_q3t17")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1892594073]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("1_ardn0")
+
+[node name="TitleLabel" type="Label" parent="." unique_id=522099701]
+layout_mode = 0
+offset_left = 90.0
+offset_top = 80.0
+offset_right = 344.0
+offset_bottom = 116.0
+theme_override_colors/font_color = Color(0, 0.8980392, 1, 1)
+theme_override_fonts/font = ExtResource("2_q3t17")
+theme_override_font_sizes/font_size = 28
+text = "SELECT LEVEL"
+
+[node name="GridContainer" type="GridContainer" parent="." unique_id=24629513]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 150.0
+offset_right = 80.0
+offset_bottom = 190.0
+columns = 3
+
+[node name="BackButton" type="Button" parent="." unique_id=1350623941]
+layout_mode = 0
+offset_left = 90.0
+offset_top = 750.0
+offset_right = 390.0
+offset_bottom = 810.0
+text = "← BACK"

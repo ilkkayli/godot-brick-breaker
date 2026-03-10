@@ -24,3 +24,8 @@ func _load() -> void:
 		var text = file.get_as_text()
 		file.close()
 		_data = JSON.parse_string(text)
+		
+func update_highest_level(level: int) -> void:
+	var current_highest = get_setting("highest_level", 1)
+	if level > current_highest:
+		set_setting("highest_level", level)

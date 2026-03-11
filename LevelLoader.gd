@@ -4,16 +4,14 @@ class_name LevelLoader
 const BRICK_SCENE = preload("res://Brick.tscn")
 const TOP_OFFSET = 80
 
-func load_level(level_number: int, parent: Node) -> int:
+func load_level(episode: int, level_number: int, parent: Node) -> int:
 	print("=== load_level kutsuttu ===")
 	print(get_stack())
-	var path = "res://levels/level_%d.txt" % level_number
+	var path = "res://levels/episode_%d/level_%d.txt" % [episode, level_number]
 
 	if not FileAccess.file_exists(path):
-		path = "res://levels/level_1.txt"
-		if not FileAccess.file_exists(path):
-			print("VIRHE: level_1.txt puuttuu!")
-			return 0
+		print("VIRHE: kenttää ei löydy: ", path)
+		return 0
 
 	print("Ladataan: ", path)
 	var file = FileAccess.open(path, FileAccess.READ)

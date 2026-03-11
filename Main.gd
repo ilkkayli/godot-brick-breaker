@@ -33,6 +33,7 @@ var loader = LevelLoader.new()
 @onready var pause_screen = $PauseLayer/Pause
 @onready var pause_button = $HUD/TopBar/PauseButton
 @onready var confirm_dialog = $ConfirmLayer/ConfirmDialog
+@onready var background = $Background
 
 const SLOW_DURATION: float = 8.0
 const SLOW_MULTIPLIER: float = 0.5
@@ -42,6 +43,7 @@ var is_slowed: bool = false
 func _ready() -> void:
 	level = SaveManager.get_setting("current_level", 1)
 	score = SaveManager.get_setting("current_score", 0)
+	_load_background()
 	spawn_bricks()
 	death_zone.body_entered.connect(_on_death_zone_body_entered)
 	update_hud()
@@ -51,10 +53,6 @@ func _ready() -> void:
 	game_over_screen.watch_ad.connect(_on_watch_ad)
 	pause_screen.resume_game.connect(_on_resume_pressed)
 	pause_screen.go_to_menu.connect(_on_menu_pressed)
-	pause_button.process_mode = Node.PROCESS_MODE_ALWAYS
-	$ConfirmLayer/ConfirmDialog/PanelContainer/VBoxContainer/HBoxContainer/YesButton.pressed.connect(_on_confirm_yes)
-	$ConfirmLayer/ConfirmDialog/PanelContainer/VBoxContainer/HBoxContainer/NoButton.pressed.connect(_on_confirm_no)
-	confirm_dialog.process_mode = Node.PROCESS_MODE_ALWAYS
 
 func _on_menu_pressed() -> void:
 	get_tree().paused = true
@@ -77,8 +75,9 @@ func update_hud() -> void:
 func spawn_bricks() -> void:
 	for child in get_children():
 		if child is StaticBody2D and child.has_method("hit"):
-			child.queue_free() 
-	bricks_remaining = loader.load_level(level, self)
+			child.queue_free()
+	var episode = SaveManager.get_setting("current_episode", 1)
+	bricks_remaining = loader.load_level(episode, level, self)
 	for child in get_children():
 		if child is StaticBody2D and child.has_method("hit"):
 			if not child.brick_destroyed.is_connected(_on_brick_destroyed):
@@ -96,15 +95,32 @@ func _on_brick_destroyed() -> void:
 		level_clear()
 
 func level_clear() -> void:
-	level += 1
-	update_hud()
-	ball.stop()
-	SaveManager.update_highest_level(level)
-	SaveManager.set_setting("current_level", level)
-	SaveManager.set_setting("current_score", score)
-	LevelComplete.current_level = level
-	LevelComplete.current_score = score
-	get_tree().call_deferred("change_scene_to_file", "res://LevelComplete.tscn")
+	var episode = SaveManager.get_setting("current_episode", 1)
+	var episode_levels = SaveManager.get_episode_level_count(episode)
+	
+	SaveManager.update_highest_level(episode, level)
+	
+	if level >= episode_levels:
+		# Episodi läpäisty
+		LevelComplete.current_level = level
+		LevelComplete.current_score = score
+		LevelComplete.episode_complete = true
+		LevelComplete.current_episode = episode
+		ball.stop()
+		SaveManager.set_setting("current_score", score)
+		get_tree().call_deferred("change_scene_to_file", "res://LevelComplete.tscn")
+	else:
+		# Seuraava level samassa episodissa
+		level += 1
+		update_hud()
+		ball.stop()
+		LevelComplete.current_level = level
+		LevelComplete.current_score = score
+		LevelComplete.episode_complete = false
+		LevelComplete.current_episode = episode
+		SaveManager.set_setting("current_level", level)
+		SaveManager.set_setting("current_score", score)
+		get_tree().call_deferred("change_scene_to_file", "res://LevelComplete.tscn")
 
 func _on_death_zone_body_entered(body: Node) -> void:
 	if not (body is CharacterBody2D and body.has_method("set_speed")):
@@ -259,3 +275,15 @@ func _on_pause_pressed() -> void:
 func _on_resume_pressed() -> void:
 	get_tree().paused = false
 	pause_screen.visible = false
+	
+func _load_background() -> void:
+	print("Background node: ", background)
+	var episode = SaveManager.get_setting("current_episode", 1)
+	print("Episode: ", episode)
+	var path = "res://assets/backgrounds/bg_episode_%d.png" % episode
+	print("Path: ", path)
+	print("Exists: ", ResourceLoader.exists(path))
+	if ResourceLoader.exists(path):
+		background.texture = load(path)
+		background.scale = Vector2(480.0 / 1536.0, 854.0 / 1024.0)
+		background.position = Vector2(240, 427)

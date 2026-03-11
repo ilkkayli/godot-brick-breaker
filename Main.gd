@@ -53,6 +53,13 @@ func _ready() -> void:
 	game_over_screen.watch_ad.connect(_on_watch_ad)
 	pause_screen.resume_game.connect(_on_resume_pressed)
 	pause_screen.go_to_menu.connect(_on_menu_pressed)
+	var yes_btn = $ConfirmLayer/ConfirmDialog/PanelContainer/VBoxContainer/HBoxContainer/YesButton
+	var no_btn = $ConfirmLayer/ConfirmDialog/PanelContainer/VBoxContainer/HBoxContainer/NoButton
+	yes_btn.process_mode = Node.PROCESS_MODE_ALWAYS
+	no_btn.process_mode = Node.PROCESS_MODE_ALWAYS
+	yes_btn.pressed.connect(_on_confirm_yes)
+	no_btn.pressed.connect(_on_confirm_no)
+	confirm_dialog.process_mode = Node.PROCESS_MODE_ALWAYS
 
 func _on_menu_pressed() -> void:
 	get_tree().paused = true
@@ -277,13 +284,11 @@ func _on_resume_pressed() -> void:
 	pause_screen.visible = false
 	
 func _load_background() -> void:
-	print("Background node: ", background)
 	var episode = SaveManager.get_setting("current_episode", 1)
-	print("Episode: ", episode)
 	var path = "res://assets/backgrounds/bg_episode_%d.png" % episode
-	print("Path: ", path)
-	print("Exists: ", ResourceLoader.exists(path))
 	if ResourceLoader.exists(path):
 		background.texture = load(path)
-		background.scale = Vector2(480.0 / 1536.0, 854.0 / 1024.0)
+		background.scale = Vector2(480.0 / 1024.0, 854.0 / 1536.0)
 		background.position = Vector2(240, 427)
+	else:
+		print("Taustakuvaa ei löydy: ", path)

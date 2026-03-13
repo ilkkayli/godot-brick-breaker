@@ -97,3 +97,18 @@ func _load() -> void:
 		var text = file.get_as_text()
 		file.close()
 		_data = JSON.parse_string(text)
+		
+const DIFFICULTY_DATA = {
+	"easy":   {"paddle_multiplier": 1.25, "powerup_chance": 0.30, "lives": 5,
+		"speeds": {1: 260, 2: 280, 3: 300, 4: 320}},
+	"normal": {"paddle_multiplier": 1.0,  "powerup_chance": 0.18, "lives": 3,
+		"speeds": {1: 300, 2: 330, 3: 360, 4: 390}},
+	"hard":   {"paddle_multiplier": 0.8,  "powerup_chance": 0.10, "lives": 2,
+		"speeds": {1: 340, 2: 380, 3: 420, 4: 460}}
+}
+
+func get_difficulty() -> String:
+	return get_setting("difficulty", "normal")
+
+func get_difficulty_data() -> Dictionary:
+	return DIFFICULTY_DATA[get_difficulty()]

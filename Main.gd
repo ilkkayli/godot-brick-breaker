@@ -4,9 +4,9 @@ const BRICK_SCENE = preload("res://Brick.tscn")
 const PowerUp = preload("res://PowerUp.gd")
 const LevelComplete = preload("res://LevelComplete.gd")
 
-const BASE_SPEED = 500.0
-const SPEED_INCREMENT = 40.0
-const MAX_LIVES = 3
+var BASE_SPEED = 500.0
+var SPEED_INCREMENT = 40.0
+var MAX_LIVES = 3
 
 var score = 0
 var game_over = false
@@ -41,6 +41,31 @@ var slow_timer: float = 0.0
 var is_slowed: bool = false
 
 func _ready() -> void:
+	var diff = SaveManager.get_difficulty_data()
+	var episode = SaveManager.get_setting("current_episode", 1)
+	
+	print("=== DIFFICULTY DEBUG ===")
+	print("Difficulty: ", SaveManager.get_difficulty())
+	print("BASE_SPEED: ", diff["speeds"][episode])
+	print("PADDLE_WIDTH: ", 110.0 * diff["paddle_multiplier"])
+	print("MAX_LIVES: ", diff["lives"])
+	print("Powerup chance: ", diff["powerup_chance"])
+	print("========================")
+	
+	# Ball speed episodin mukaan
+	BASE_SPEED = diff["speeds"][episode]
+	
+	# Paddle width
+	paddle.PADDLE_WIDTH = 110.0 * diff["paddle_multiplier"]
+	paddle.apply_width()
+	
+	# Lives
+	MAX_LIVES = diff["lives"]
+	lives = MAX_LIVES
+	
+	# Aseta pallon nopeus heti
+	ball.speed = BASE_SPEED
+	
 	level = SaveManager.get_setting("current_level", 1)
 	score = SaveManager.get_setting("current_score", 0)
 	_load_background()
@@ -80,6 +105,7 @@ func update_hud() -> void:
 	lives_label.text = "Lives: " + str(lives)
 
 func spawn_bricks() -> void:
+	bricks_destroyed_count = 0
 	for child in get_children():
 		if child is StaticBody2D and child.has_method("hit"):
 			child.queue_free()
@@ -94,9 +120,19 @@ func respawn_ball() -> void:
 	ball.speed = BASE_SPEED + (level - 1) * SPEED_INCREMENT
 	ball.attach_to_paddle(paddle)
 
+var bricks_destroyed_count: int = 0
+
 func _on_brick_destroyed() -> void:
 	score += 10
 	bricks_remaining -= 1
+	bricks_destroyed_count += 1
+	
+	# Speed boost joka 10. tiilestä
+	if bricks_destroyed_count % 10 == 0:
+		for b in get_tree().get_nodes_in_group("balls"):
+			b.speed += 5
+			b.velocity = b.velocity.normalized() * b.speed
+	
 	update_hud()
 	if bricks_remaining <= 0:
 		level_clear()

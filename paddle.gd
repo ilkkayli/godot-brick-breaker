@@ -1,7 +1,7 @@
 extends CharacterBody2D
 
-const PADDLE_WIDTH: float = 110.0
-const PADDLE_WIDTH_POWERED: float = 320.0
+var PADDLE_WIDTH: float = 110.0
+var PADDLE_WIDTH_POWERED: float = 180.0
 const POWERUP_DURATION: float = 10.0
 
 var screen_width: float = 0.0
@@ -70,3 +70,9 @@ func _update_shape() -> void:
 		sprite.scale.x = base_sprite_scale_x * (PADDLE_WIDTH_POWERED / PADDLE_WIDTH)
 	else:
 		sprite.scale.x = base_sprite_scale_x
+		
+func apply_width() -> void:
+	var shape = $CollisionShape2D.shape
+	shape.size = Vector2(PADDLE_WIDTH, shape.size.y)
+	$Sprite2D.scale.x = 0.314 * (PADDLE_WIDTH / 110.0)
+	base_sprite_scale_x = $Sprite2D.scale.x

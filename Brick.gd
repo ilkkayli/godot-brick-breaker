@@ -62,7 +62,8 @@ func _on_destroyed() -> void:
 		_explode()
 	else:
 		main.snd_brick_break.play()
-	if randf() < POWERUP_CHANCE:
+	var chance = SaveManager.get_difficulty_data()["powerup_chance"]
+	if randf() < chance:
 		var powerup = POWERUP_SCENE.instantiate()
 		powerup.position = global_position
 		var types = PowerUp.Type.values()
@@ -118,3 +119,4 @@ func _explode() -> void:
 			if child is StaticBody2D and child.has_method("hit"):
 				if child.global_position.distance_to(target_pos) < 10:
 					child.hit()
+					

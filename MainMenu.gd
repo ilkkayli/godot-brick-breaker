@@ -2,8 +2,6 @@ extends Control
 
 const MAIN_SCENE = "res://main.tscn"
 
-@onready var settings_screen = $SettingsLayer/Settings
-
 func _ready() -> void:
 	var high_score = load_high_score()
 	$VBoxContainer/HighScoreLabel.text = "Best: " + str(high_score)
@@ -12,16 +10,13 @@ func _ready() -> void:
 	$VBoxContainer/QuitButton.pressed.connect(_on_quit_pressed)
 
 func _on_play_pressed() -> void:
-	get_tree().call_deferred("change_scene_to_file", "res://LevelSelect.tscn")
+	get_tree().call_deferred("change_scene_to_file", "res://DifficultySelect.tscn")
 
 func _change_to_main() -> void:
 	get_tree().change_scene_to_file("res://main.tscn")
 
 func _on_settings_pressed() -> void:
 	get_tree().call_deferred("change_scene_to_file", "res://Settings.tscn")
-
-func _on_settings_closed() -> void:
-	settings_screen.visible = false
 
 func _on_quit_pressed() -> void:
 	get_tree().quit()

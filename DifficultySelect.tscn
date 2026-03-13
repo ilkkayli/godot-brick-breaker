@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://biq06cjkwybum"]
+
+[ext_resource type="Script" uid="uid://dlq4yh0uu5oga" path="res://DifficultySelect.gd" id="1_lsqiq"]
+[ext_resource type="Texture2D" uid="uid://cwt5ad3suhrur" path="res://background_v5.png" id="2_d0e0e"]
+[ext_resource type="FontFile" uid="uid://dht3tl6ofdgw5" path="res://assets/fonts/orbitron.ttf" id="3_2hryf"]
+
+[node name="Control" type="Control" unique_id=1611156042]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_lsqiq")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1605486034]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("2_d0e0e")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1620181802]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 180.0
+offset_top = 300.0
+offset_right = 278.0
+offset_bottom = 388.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="VBoxContainer" unique_id=1028082365]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_2hryf")
+text = "SELECT DIFFICULTY"
+
+[node name="EasyButton" type="Button" parent="VBoxContainer" unique_id=1555607773]
+layout_mode = 2
+text = "EASY"
+
+[node name="NormalButton" type="Button" parent="VBoxContainer" unique_id=1098692042]
+layout_mode = 2
+text = "NORMAL"
+
+[node name="HardButton" type="Button" parent="VBoxContainer" unique_id=437865496]
+layout_mode = 2
+text = "HARD"

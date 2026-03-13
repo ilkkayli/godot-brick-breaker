@@ -100,11 +100,11 @@ func _load() -> void:
 		
 const DIFFICULTY_DATA = {
 	"easy":   {"paddle_multiplier": 1.25, "powerup_chance": 0.30, "lives": 5,
-		"speeds": {1: 260, 2: 280, 3: 300, 4: 320}},
+		"speeds": {1: 260, 2: 280, 3: 300, 4: 320}, "score_multiplier": 1.0},
 	"normal": {"paddle_multiplier": 1.0,  "powerup_chance": 0.18, "lives": 3,
-		"speeds": {1: 300, 2: 330, 3: 360, 4: 390}},
+		"speeds": {1: 300, 2: 330, 3: 360, 4: 390}, "score_multiplier": 1.5},
 	"hard":   {"paddle_multiplier": 0.8,  "powerup_chance": 0.10, "lives": 2,
-		"speeds": {1: 340, 2: 380, 3: 420, 4: 460}}
+		"speeds": {1: 340, 2: 380, 3: 420, 4: 460}, "score_multiplier": 2.0}
 }
 
 func get_difficulty() -> String:

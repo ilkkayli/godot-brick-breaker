@@ -14,6 +14,7 @@ var level = 1
 var bricks_remaining = 0
 var lives = MAX_LIVES
 var loader = LevelLoader.new()
+var score_multiplier: float = 1.0
 
 @onready var ball = $Ball
 @onready var paddle = $Paddle
@@ -34,6 +35,7 @@ var loader = LevelLoader.new()
 @onready var pause_button = $HUD/TopBar/PauseButton
 @onready var confirm_dialog = $ConfirmLayer/ConfirmDialog
 @onready var background = $Background
+@onready var multiplier_label = $HUD/MultiplierLabel
 
 const SLOW_DURATION: float = 8.0
 const SLOW_MULTIPLIER: float = 0.5
@@ -41,11 +43,21 @@ var slow_timer: float = 0.0
 var is_slowed: bool = false
 
 func _ready() -> void:
+	var font = load("res://assets/fonts/orbitron.ttf")
+	multiplier_label.add_theme_font_override("font", font)
+	multiplier_label.add_theme_font_size_override("font_size", 16)
+	
+	var difficulty = SaveManager.get_difficulty()
 	var diff = SaveManager.get_difficulty_data()
 	var episode = SaveManager.get_setting("current_episode", 1)
-	
+	score_multiplier = diff["score_multiplier"]
+
+	match difficulty:
+		"normal": multiplier_label.add_theme_color_override("font_color", Color("#FFD700"))
+		"hard":   multiplier_label.add_theme_color_override("font_color", Color("#FF1744"))
+
 	print("=== DIFFICULTY DEBUG ===")
-	print("Difficulty: ", SaveManager.get_difficulty())
+	print("Difficulty: ", difficulty)
 	print("BASE_SPEED: ", diff["speeds"][episode])
 	print("PADDLE_WIDTH: ", 110.0 * diff["paddle_multiplier"])
 	print("MAX_LIVES: ", diff["lives"])
@@ -103,6 +115,11 @@ func update_hud() -> void:
 	score_label.text = "Score: " + str(score)
 	level_label.text = "Level: " + str(level)
 	lives_label.text = "Lives: " + str(lives)
+	var diff = SaveManager.get_difficulty()
+	match diff:
+		"normal": multiplier_label.text = "Bonus x1.5"
+		"hard":   multiplier_label.text = "Bonus x2"
+		_:        multiplier_label.text = ""
 
 func spawn_bricks() -> void:
 	bricks_destroyed_count = 0
@@ -123,7 +140,7 @@ func respawn_ball() -> void:
 var bricks_destroyed_count: int = 0
 
 func _on_brick_destroyed() -> void:
-	score += 10
+	score += int(10 * score_multiplier)
 	bricks_remaining -= 1
 	bricks_destroyed_count += 1
 	

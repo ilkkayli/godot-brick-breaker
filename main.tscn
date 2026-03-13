@@ -67,6 +67,12 @@ shape = SubResource("RectangleShape2D_1bvp3")
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=2049628320]
 
+[node name="MultiplierLabel" type="Label" parent="HUD" unique_id=1533059244]
+offset_left = 50.0
+offset_top = 50.0
+offset_right = 51.0
+offset_bottom = 73.0
+
 [node name="TopBar" type="HBoxContainer" parent="HUD" unique_id=741500545]
 anchors_preset = 10
 anchor_right = 1.0

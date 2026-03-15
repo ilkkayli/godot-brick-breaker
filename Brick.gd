@@ -108,6 +108,8 @@ func _screen_shake() -> void:
 		camera.shake(0.3, 8.0)
 
 func _explode() -> void:
+	if DailyChallenge.is_active:
+		ScoreManager.explosion_chain()
 	var neighbors = [
 		Vector2(0, -1), Vector2(0, 1),
 		Vector2(-1, 0), Vector2(1, 0)

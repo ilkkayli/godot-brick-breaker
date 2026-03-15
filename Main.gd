@@ -29,14 +29,15 @@ var score_multiplier: float = 1.0
 @onready var snd_powerup = $SndPowerup
 @onready var snd_explosion = $SndExplosion
 @onready var snd_game_over = $SndGameOver
-@onready var menu_button = $HUD/TopBar/MenuButton  
+@onready var menu_button = $HUD/TopBar/MenuButton
 @onready var game_over_screen = $GameOverLayer/GameOver
 @onready var music_player = $MusicPlayer
 @onready var pause_screen = $PauseLayer/Pause
-@onready var pause_button = $HUD/TopBar/PauseButton
+@onready var pause_button = $HUD/PauseButton
 @onready var confirm_dialog = $ConfirmLayer/ConfirmDialog
 @onready var background = $Background
 @onready var multiplier_label = $HUD/MultiplierLabel
+@onready var combo_label = $HUD/ComboLabel
 
 const SLOW_DURATION: float = 8.0
 const SLOW_MULTIPLIER: float = 0.5
@@ -47,6 +48,13 @@ func _ready() -> void:
 	var font = load("res://assets/fonts/orbitron.ttf")
 	multiplier_label.add_theme_font_override("font", font)
 	multiplier_label.add_theme_font_size_override("font_size", 16)
+	
+	combo_label.add_theme_font_override("font", font)
+	combo_label.add_theme_font_size_override("font_size", 24)
+	combo_label.add_theme_color_override("font_color", Color("#FF9E00"))
+	combo_label.visible = false
+	
+	pause_button.process_mode = Node.PROCESS_MODE_ALWAYS
 	
 	var difficulty = SaveManager.get_difficulty()
 	var diff = SaveManager.get_difficulty_data()
@@ -69,6 +77,9 @@ func _ready() -> void:
 		BASE_SPEED = 300.0
 		level = 1
 		score = 0
+		ScoreManager.reset()
+		ScoreManager.score_changed.connect(_on_score_changed)
+		ScoreManager.combo_changed.connect(_on_combo_changed)
 	else:
 		BASE_SPEED = diff["speeds"][episode]
 		level = int(SaveManager.get_setting("current_level", 1))
@@ -90,6 +101,10 @@ func _ready() -> void:
 	
 	_load_background()
 	spawn_bricks()
+	
+	if DailyChallenge.is_active:
+		ScoreManager.bricks_remaining = bricks_remaining
+	
 	death_zone.body_entered.connect(_on_death_zone_body_entered)
 	update_hud()
 	menu_button.pressed.connect(_on_menu_pressed)
@@ -109,7 +124,7 @@ func _ready() -> void:
 func _on_menu_pressed() -> void:
 	get_tree().paused = true
 	confirm_dialog.visible = true
-	
+
 func _on_confirm_yes() -> void:
 	confirm_dialog.visible = false
 	get_tree().paused = false
@@ -121,8 +136,11 @@ func _on_confirm_no() -> void:
 
 func update_hud() -> void:
 	score_label.text = "Score: " + str(score)
-	level_label.text = "Level: " + str(level)
 	lives_label.text = "Lives: " + str(lives)
+	if DailyChallenge.is_active:
+		level_label.text = ""
+	else:
+		level_label.text = "Level: " + str(level)
 	var diff = SaveManager.get_difficulty()
 	match diff:
 		"normal": multiplier_label.text = "Bonus x1.5"
@@ -153,11 +171,15 @@ func respawn_ball() -> void:
 var bricks_destroyed_count: int = 0
 
 func _on_brick_destroyed() -> void:
-	score += int(10 * score_multiplier)
 	bricks_remaining -= 1
 	bricks_destroyed_count += 1
 	
-	# Speed boost joka 10. tiilestä
+	if DailyChallenge.is_active:
+		ScoreManager.brick_destroyed(bricks_remaining <= 0)
+		score = ScoreManager.score
+	else:
+		score += int(10 * score_multiplier)
+	
 	if bricks_destroyed_count % 10 == 0:
 		for b in get_tree().get_nodes_in_group("balls"):
 			b.speed += 5
@@ -169,6 +191,8 @@ func _on_brick_destroyed() -> void:
 
 func level_clear() -> void:
 	if DailyChallenge.is_active:
+		ScoreManager.level_completed()
+		score = ScoreManager.score
 		DailyChallengeResult.final_score = score
 		DailyChallenge.is_active = false
 		ball.stop()
@@ -181,7 +205,6 @@ func level_clear() -> void:
 	SaveManager.update_highest_level(episode, level)
 	
 	if level >= episode_levels:
-		# Episodi läpäisty
 		LevelComplete.current_level = level
 		LevelComplete.current_score = score
 		LevelComplete.episode_complete = true
@@ -190,7 +213,6 @@ func level_clear() -> void:
 		SaveManager.set_setting("current_score", score)
 		get_tree().call_deferred("change_scene_to_file", "res://LevelComplete.tscn")
 	else:
-		# Seuraava level samassa episodissa
 		level += 1
 		update_hud()
 		ball.stop()
@@ -262,10 +284,8 @@ func restart() -> void:
 	update_hud()
 
 func _process(delta: float) -> void:
-	# Pallo seuraa paddlea kun kiinnitetty
 	if ball.attached:
 		ball.position = Vector2(paddle.position.x, paddle.position.y - 25)
-
 	if is_slowed:
 		slow_timer -= delta
 		if slow_timer <= 0:
@@ -301,7 +321,7 @@ func spawn_extra_ball() -> void:
 	new_ball.position = Vector2(paddle.position.x, paddle.position.y - 25)
 	new_ball.speed = BASE_SPEED + (level - 1) * SPEED_INCREMENT
 	add_child(new_ball)
-	new_ball.launch()  # ← käynnistä heti
+	new_ball.launch()
 	print("Multiball!")
 
 func activate_slow() -> void:
@@ -319,7 +339,7 @@ func _set_all_ball_speeds(new_speed: float) -> void:
 	for child in get_children():
 		if child is CharacterBody2D and child.has_method("set_speed"):
 			child.set_speed(new_speed)
-			
+
 func save_high_score() -> void:
 	var current_best = load_high_score()
 	if score > current_best:
@@ -334,19 +354,18 @@ func load_high_score() -> int:
 		file.close()
 		return s
 	return 0
-	
+
 func _on_game_over_restart() -> void:
 	game_over_screen.visible = false
 	restart()
 
 func _on_watch_ad() -> void:
-	# Rewarded ad logiikka tulee tähän myöhemmin
 	game_over_screen.visible = false
 	lives = 1
 	game_over = false
 	respawn_ball()
 	update_hud()
-	
+
 func _on_music_finished() -> void:
 	music_player.play()
 
@@ -361,7 +380,7 @@ func _on_pause_pressed() -> void:
 func _on_resume_pressed() -> void:
 	get_tree().paused = false
 	pause_screen.visible = false
-	
+
 func _load_background() -> void:
 	var episode = SaveManager.get_setting("current_episode", 1)
 	var path = "res://assets/backgrounds/bg_episode_%d.png" % episode
@@ -371,7 +390,7 @@ func _load_background() -> void:
 		background.position = Vector2(240, 427)
 	else:
 		print("Taustakuvaa ei löydy: ", path)
-		
+
 func _spawn_daily_bricks() -> int:
 	var grid = DailyChallenge.generate_level()
 	var breakable = 0
@@ -400,7 +419,7 @@ func _spawn_daily_bricks() -> int:
 			if brick_type != Brick.Type.UNBREAKABLE:
 				breakable += 1
 	return breakable
-	
+
 func _char_to_brick_type(ch: String) -> int:
 	match ch:
 		"B": return Brick.Type.NORMAL
@@ -419,7 +438,20 @@ func _apply_daily_modifier() -> void:
 			paddle.PADDLE_WIDTH *= 0.5
 			paddle.apply_width()
 		"extra_powerups":
-			pass  # Hoidetaan Brick.gd:ssä
+			pass
 		"multiball_start":
 			spawn_extra_ball()
 			spawn_extra_ball()
+
+func _on_combo_changed(new_combo: int) -> void:
+	if not DailyChallenge.is_active:
+		return
+	if new_combo >= 2:
+		combo_label.text = "COMBO x%d!" % ScoreManager.multiplier
+		combo_label.visible = true
+	else:
+		combo_label.visible = false
+
+func _on_score_changed(new_score: int) -> void:
+	score = new_score
+	update_hud()

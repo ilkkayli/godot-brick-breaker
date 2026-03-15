@@ -37,6 +37,8 @@ func _physics_process(delta: float) -> void:
 			velocity = velocity.bounce(collision.get_normal())
 			collider.hit()
 		elif collider.is_in_group("paddle"):
+			if DailyChallenge.is_active:
+				ScoreManager.paddle_hit()
 			_bounce_off_paddle(collider, collision)
 		else:
 			velocity = velocity.bounce(collision.get_normal())

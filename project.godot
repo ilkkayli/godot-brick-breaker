@@ -24,6 +24,7 @@ buses/default_bus_layout="uid://clfhjfkudm2em"
 
 SaveManager="*uid://dqphtk2kjslsk"
 DailyChallenge="*uid://dfeu34ehc3bg7"
+ScoreManager="*uid://chwosaouxpqfd"
 
 [display]
 

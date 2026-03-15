@@ -1,0 +1,52 @@
+[gd_scene format=3 uid="uid://dgtkrpfxieps"]
+
+[ext_resource type="Script" uid="uid://c41vkepsgef6i" path="res://DailyChallengeResult.gd" id="1_ydh0m"]
+[ext_resource type="Texture2D" uid="uid://cwt5ad3suhrur" path="res://background_v5.png" id="2_bsayw"]
+
+[node name="DailyChallengeResult" type="Control" unique_id=1684803534]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ydh0m")
+
+[node name="Background" type="TextureRect" parent="." unique_id=477363844]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_bsayw")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=228497274]
+layout_mode = 0
+offset_left = 90.0
+offset_top = 250.0
+offset_right = 130.0
+offset_bottom = 351.0
+theme_override_constants/separation = 20
+
+[node name="TitleLabel" type="Label" parent="VBoxContainer" unique_id=1983005826]
+layout_mode = 2
+text = "DAILY CHALLENGE"
+
+[node name="ResultLabel" type="Label" parent="VBoxContainer" unique_id=934438945]
+layout_mode = 2
+text = "COMPLETE!"
+
+[node name="ScoreLabel" type="Label" parent="VBoxContainer" unique_id=880859210]
+layout_mode = 2
+text = "Score: 0"
+
+[node name="RetryButton" type="Button" parent="VBoxContainer" unique_id=1275211174]
+custom_minimum_size = Vector2(300, 60)
+layout_mode = 2
+text = "PLAY AGAIN"
+
+[node name="MenuButton" type="Button" parent="VBoxContainer" unique_id=1886956858]
+custom_minimum_size = Vector2(300, 60)
+layout_mode = 2
+text = "← BACK TO MENU"

@@ -3,6 +3,7 @@ extends Node2D
 const BRICK_SCENE = preload("res://Brick.tscn")
 const PowerUp = preload("res://PowerUp.gd")
 const LevelComplete = preload("res://LevelComplete.gd")
+const DailyChallengeResult = preload("res://DailyChallengeResult.gd")
 
 var BASE_SPEED = 500.0
 var SPEED_INCREMENT = 40.0
@@ -49,13 +50,13 @@ func _ready() -> void:
 	
 	var difficulty = SaveManager.get_difficulty()
 	var diff = SaveManager.get_difficulty_data()
-	var episode = SaveManager.get_setting("current_episode", 1)
+	var episode = int(SaveManager.get_setting("current_episode", 1))
 	score_multiplier = diff["score_multiplier"]
-
+	
 	match difficulty:
 		"normal": multiplier_label.add_theme_color_override("font_color", Color("#FFD700"))
 		"hard":   multiplier_label.add_theme_color_override("font_color", Color("#FF1744"))
-
+	
 	print("=== DIFFICULTY DEBUG ===")
 	print("Difficulty: ", difficulty)
 	print("BASE_SPEED: ", diff["speeds"][episode])
@@ -64,8 +65,14 @@ func _ready() -> void:
 	print("Powerup chance: ", diff["powerup_chance"])
 	print("========================")
 	
-	# Ball speed episodin mukaan
-	BASE_SPEED = diff["speeds"][episode]
+	if DailyChallenge.is_active:
+		BASE_SPEED = 300.0
+		level = 1
+		score = 0
+	else:
+		BASE_SPEED = diff["speeds"][episode]
+		level = int(SaveManager.get_setting("current_level", 1))
+		score = int(SaveManager.get_setting("current_score", 0))
 	
 	# Paddle width
 	paddle.PADDLE_WIDTH = 110.0 * diff["paddle_multiplier"]
@@ -78,8 +85,9 @@ func _ready() -> void:
 	# Aseta pallon nopeus heti
 	ball.speed = BASE_SPEED
 	
-	level = SaveManager.get_setting("current_level", 1)
-	score = SaveManager.get_setting("current_score", 0)
+	if DailyChallenge.is_active:
+		_apply_daily_modifier()
+	
 	_load_background()
 	spawn_bricks()
 	death_zone.body_entered.connect(_on_death_zone_body_entered)
@@ -126,8 +134,13 @@ func spawn_bricks() -> void:
 	for child in get_children():
 		if child is StaticBody2D and child.has_method("hit"):
 			child.queue_free()
-	var episode = SaveManager.get_setting("current_episode", 1)
-	bricks_remaining = loader.load_level(episode, level, self)
+	
+	if DailyChallenge.is_active:
+		bricks_remaining = _spawn_daily_bricks()
+	else:
+		var episode = SaveManager.get_setting("current_episode", 1)
+		bricks_remaining = loader.load_level(episode, level, self)
+	
 	for child in get_children():
 		if child is StaticBody2D and child.has_method("hit"):
 			if not child.brick_destroyed.is_connected(_on_brick_destroyed):
@@ -155,6 +168,13 @@ func _on_brick_destroyed() -> void:
 		level_clear()
 
 func level_clear() -> void:
+	if DailyChallenge.is_active:
+		DailyChallengeResult.final_score = score
+		DailyChallenge.is_active = false
+		ball.stop()
+		get_tree().call_deferred("change_scene_to_file", "res://DailyChallengeResult.tscn")
+		return
+		
 	var episode = SaveManager.get_setting("current_episode", 1)
 	var episode_levels = SaveManager.get_episode_level_count(episode)
 	
@@ -200,12 +220,18 @@ func _on_death_zone_body_entered(body: Node) -> void:
 			print("Lives remaining: ", lives)
 			respawn_ball()
 		else:
-			game_over = true
-			save_high_score()
-			snd_game_over.play()
-			game_over_screen.setup(score, load_high_score())
-			game_over_screen.visible = true
-			print("GAME OVER | Score: ", score, " | Level: ", level)
+			if DailyChallenge.is_active:
+				print("DailyChallenge.is_active: ", DailyChallenge.is_active)
+				DailyChallengeResult.final_score = score
+				DailyChallenge.is_active = false
+				get_tree().call_deferred("change_scene_to_file", "res://DailyChallengeResult.tscn")
+			else:
+				game_over = true
+				save_high_score()
+				snd_game_over.play()
+				game_over_screen.setup(score, load_high_score())
+				game_over_screen.visible = true
+				print("GAME OVER | Score: ", score, " | Level: ", level)
 
 func _input(event: InputEvent) -> void:
 	if ball.attached:
@@ -345,3 +371,55 @@ func _load_background() -> void:
 		background.position = Vector2(240, 427)
 	else:
 		print("Taustakuvaa ei löydy: ", path)
+		
+func _spawn_daily_bricks() -> int:
+	var grid = DailyChallenge.generate_level()
+	var breakable = 0
+	var cols = grid[0].size()
+	var rows = grid.size()
+	var screen_w = 480.0
+	var margin = 10.0
+	var gap_x = 6.0
+	var gap_y = 1.0
+	var brick_w = (screen_w - margin * 2 - gap_x * (cols - 1)) / cols
+	var brick_h = brick_w
+	var start_x = margin + brick_w / 2.0
+	
+	for r in range(rows):
+		for c in range(cols):
+			var ch = grid[r][c]
+			if ch == ".":
+				continue
+			var brick_type = _char_to_brick_type(ch)
+			var brick = BRICK_SCENE.instantiate()
+			brick.position = Vector2(start_x + c * (brick_w + gap_x), 80 + r * (brick_h + gap_y))
+			add_child(brick)
+			brick.setup(brick_type)
+			brick.get_node("Sprite2D").scale = Vector2(brick_w / 310.0, brick_h / 200.0)
+			brick.get_node("CollisionShape2D").shape.size = Vector2(brick_w / 2.0, brick_h / 2.0)
+			if brick_type != Brick.Type.UNBREAKABLE:
+				breakable += 1
+	return breakable
+	
+func _char_to_brick_type(ch: String) -> int:
+	match ch:
+		"B": return Brick.Type.NORMAL
+		"S": return Brick.Type.STRONG
+		"E": return Brick.Type.EXPLOSIVE
+		"U": return Brick.Type.UNBREAKABLE
+	return Brick.Type.NORMAL
+
+func _apply_daily_modifier() -> void:
+	var key = DailyChallenge.modifier["key"]
+	match key:
+		"fast_ball":
+			BASE_SPEED *= 1.5
+			ball.speed = BASE_SPEED
+		"small_paddle":
+			paddle.PADDLE_WIDTH *= 0.5
+			paddle.apply_width()
+		"extra_powerups":
+			pass  # Hoidetaan Brick.gd:ssä
+		"multiball_start":
+			spawn_extra_ball()
+			spawn_extra_ball()

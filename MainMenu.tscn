@@ -50,6 +50,10 @@ theme_override_fonts/font = ExtResource("2_h7a2f")
 theme_override_font_sizes/font_size = 20
 text = "PLAY"
 
+[node name="DailyChallengeButton" type="Button" parent="VBoxContainer" unique_id=940354571]
+layout_mode = 2
+text = "DAILY CHALLENGE"
+
 [node name="SettingsButton" type="Button" parent="VBoxContainer" unique_id=443967580]
 custom_minimum_size = Vector2(300, 60)
 layout_mode = 2

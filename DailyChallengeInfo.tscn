@@ -1,0 +1,62 @@
+[gd_scene format=3 uid="uid://djquat2a1wde5"]
+
+[ext_resource type="Script" uid="uid://h4dp0si306rc" path="res://DailyChallengeInfo.gd" id="1_3tb14"]
+[ext_resource type="Texture2D" uid="uid://cwt5ad3suhrur" path="res://background_v5.png" id="1_r0j5n"]
+
+[node name="DailyChallengeInfo" type="Control" unique_id=1997274883]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_3tb14")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1585635924]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("1_r0j5n")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=884237335]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -277.0
+offset_right = 150.0
+offset_bottom = 223.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 15
+
+[node name="TitleLabel" type="Label" parent="VBoxContainer" unique_id=26200346]
+layout_mode = 2
+text = "DAILY CHALLENGE"
+
+[node name="DateLabel" type="Label" parent="VBoxContainer" unique_id=1182195528]
+layout_mode = 2
+text = "2026-03-13"
+
+[node name="ModifierLabel" type="Label" parent="VBoxContainer" unique_id=687026351]
+layout_mode = 2
+text = "Modifier:"
+
+[node name="DescLabel" type="Label" parent="VBoxContainer" unique_id=1191547059]
+layout_mode = 2
+text = "Description"
+
+[node name="GoalLabel" type="Label" parent="VBoxContainer" unique_id=526664333]
+layout_mode = 2
+text = "Goal: Score as many points as possible"
+
+[node name="PlayButton" type="Button" parent="VBoxContainer" unique_id=842059188]
+layout_mode = 2
+text = "PLAY"
+
+[node name="BackButton" type="Button" parent="VBoxContainer" unique_id=2077651722]
+layout_mode = 2
+text = "← BACK"

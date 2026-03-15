@@ -1,6 +1,11 @@
 extends Control
 
 func _ready() -> void:
+	var font = load("res://assets/fonts/orbitron.ttf")
+	$VBoxContainer/CloseButton.add_theme_font_override("font", font)
+	$VBoxContainer/CloseButton.add_theme_font_size_override("font_size", 22)
+	$VBoxContainer/CloseButton.custom_minimum_size = Vector2(300, 60)
+	
 	$VBoxContainer/CloseButton.pressed.connect(_on_close_pressed)
 	$VBoxContainer/MusicSlider.value_changed.connect(_on_music_volume_changed)
 	$VBoxContainer/SfxSlider.value_changed.connect(_on_sfx_volume_changed)

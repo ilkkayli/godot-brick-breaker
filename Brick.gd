@@ -63,6 +63,8 @@ func _on_destroyed() -> void:
 	else:
 		main.snd_brick_break.play()
 	var chance = SaveManager.get_difficulty_data()["powerup_chance"]
+	if DailyChallenge.is_active and DailyChallenge.modifier["key"] == "extra_powerups":
+		chance = 0.5
 	if randf() < chance:
 		var powerup = POWERUP_SCENE.instantiate()
 		powerup.position = global_position
